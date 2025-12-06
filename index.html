@@ -338,6 +338,99 @@
             background-clip: text;
         }
 
+        /* Enhanced button borders for controller visibility */
+button, .lvl-btn, .mobile-btn, .editor-tool, .costume-item {
+    border: 3px solid #000 !important;
+    box-shadow: 
+        0 0 0 2px #000,
+        0 0 20px currentColor,
+        inset 0 0 10px rgba(0,0,0,0.5) !important;
+}
+
+button:hover:not(:disabled), .lvl-btn.unlocked:hover, .costume-item:hover {
+    border: 3px solid #000 !important;
+    box-shadow: 
+        0 0 0 2px #000,
+        0 0 40px currentColor,
+        0 0 80px var(--neon-pink) !important;
+}
+
+.mobile-btn {
+    border: 4px solid #000 !important;
+    box-shadow: 
+        0 0 0 3px #000,
+        0 0 30px var(--neon-blue) !important;
+}
+
+.editor-tool {
+    border: 2px solid #000 !important;
+    box-shadow: 
+        0 0 0 1px #000,
+        0 0 10px currentColor !important;
+}
+
+.editor-tool.selected {
+    border: 3px solid #000 !important;
+    box-shadow: 
+        0 0 0 2px #000,
+        0 0 20px var(--neon-blue),
+        inset 0 0 15px rgba(0,0,0,0.7) !important;
+}
+
+/* Controller crosshair for editor */
+.editor-crosshair {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #000;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 
+        0 0 0 1px #fff,
+        0 0 10px var(--neon-blue),
+        0 0 20px var(--neon-blue);
+    display: none;
+}
+
+.editor-crosshair::before, .editor-crosshair::after {
+    content: '';
+    position: absolute;
+    background: var(--neon-blue);
+    box-shadow: 0 0 5px var(--neon-blue);
+}
+
+.editor-crosshair::before {
+    width: 2px;
+    height: 30px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.editor-crosshair::after {
+    width: 30px;
+    height: 2px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Controller toolbar highlight */
+.editor-tool.controller-highlight {
+    animation: tool-pulse 0.5s infinite alternate;
+    border: 3px solid #000 !important;
+    box-shadow: 
+        0 0 0 2px #000,
+        0 0 30px var(--neon-yellow),
+        inset 0 0 20px var(--neon-yellow) !important;
+}
+
+@keyframes tool-pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+}
+
         /* Level Grid */
         #lvl-grid {
             display: grid;
@@ -1206,6 +1299,9 @@
 
     <!-- Screen Transition Overlay -->
     <div id="screen-transition" class="screen-transition"></div>
+
+    <!-- Controller Crosshair for Editor -->
+<div class="editor-crosshair" id="editor-crosshair"></div>
 
 <script>
 // --- CONFIG & GLOBALS ---
@@ -2622,16 +2718,27 @@ LEVELS[49] = createLevel(49, [
     L(3,18,0), L(3,38,0), L(3,58,0), L(3,78,0), L(3,98,0), L(3,118,0), L(3,138,0)
 ]);
 
-// --- GAME CONTROLLER SUPPORT (UPDATE 2) ---
 const Controller = {
     connected: false,
     gamepad: null,
     buttons: {},
     axes: {},
-    deadzone: 0.15,
+    deadzone: 0.25, // LOWER SENSITIVITY (was 0.15)
+    lastButtons: {},
+    editorCursorX: 0,
+    editorCursorY: 0,
+    editorCursorSpeed: 10,
+    editorToolIndex: 1,
+    editorPlacing: false,
+    editorDestroying: false,
+    editorToolChanged: false,
     
     init: function() {
         if (!settings.controls.controller) return;
+        
+        // Initialize editor cursor position
+        this.editorCursorX = window.innerWidth / 2;
+        this.editorCursorY = window.innerHeight / 2;
         
         window.addEventListener("gamepadconnected", (e) => {
             console.log("🎮 Gamepad connected:", e.gamepad.id);
@@ -2644,8 +2751,8 @@ const Controller = {
                 e.gamepad.vibrationActuator.playEffect("dual-rumble", {
                     startDelay: 0,
                     duration: 100,
-                    weakMagnitude: 0.5,
-                    strongMagnitude: 0.3
+                    weakMagnitude: 0.3,
+                    strongMagnitude: 0.2
                 });
             }
         });
@@ -2655,6 +2762,7 @@ const Controller = {
             this.connected = false;
             this.gamepad = null;
             document.getElementById('controller-status').style.display = 'none';
+            document.getElementById('editor-crosshair').style.display = 'none';
         });
         
         // Check for existing gamepads
@@ -2692,60 +2800,219 @@ const Controller = {
         // Handle controller inputs
         this.handleInput();
     },
+
+            handleInput: function() {
+        if (!this.connected || !settings.controls.controller) return;
+        
+        this.scanGamepads();
+        if (!this.gamepad) return;
+        
+        // Store previous button states
+        this.lastButtons = {...this.buttons};
+        
+        // Update buttons
+        this.gamepad.buttons.forEach((button, index) => {
+            this.buttons[index] = button.pressed;
+        });
+        
+        // Update axes with deadzone
+        this.gamepad.axes.forEach((axis, index) => {
+            this.buttons[index] = button.pressed;
+        });
+        
+        // Update axes with deadzone
+        this.gamepad.axes.forEach((axis, index) => {
+            this.axes[index] = Math.abs(axis) > this.deadzone ? axis : 0;
+        });
+        
+        // Handle different states
+        if (Game.state === 'editor') {
+            this.handleEditorControls();
+        } else if (Game.state === 'menu') {
+            this.handleMenuControls();
+        } else if (Game.state === 'game') {
+            this.handleGameControls();
+        }
+        
+        // Home/Start button always works (button 9 is Start, 16 is Home on some controllers)
+        if (this.buttons[9] || this.buttons[16]) {
+            this.goHome();
+        }
+    },
     
-    handleInput: function() {
-        if (Game.state === 'menu') {
-            // Menu navigation with D-Pad/Stick
-            if (this.buttons[12] || this.axes[1] < -0.5) { // Up
-                this.navigateMenu(-1);
+        handleMenuControls: function() {
+        // Menu navigation with D-Pad/Stick
+        if ((this.buttons[12] || this.axes[1] < -0.5) && !this.lastButtons[12]) { // Up
+            this.navigateMenu(-1);
+        }
+        if ((this.buttons[13] || this.axes[1] > 0.5) && !this.lastButtons[13]) { // Down
+            this.navigateMenu(1);
+        }
+        if ((this.buttons[14] || this.axes[0] < -0.5) && !this.lastButtons[14]) { // Left
+            this.navigateMenu(-1, true);
+        }
+        if ((this.buttons[15] || this.axes[0] > 0.5) && !this.lastButtons[15]) { // Right
+            this.navigateMenu(1, true);
+        }
+        
+        // A button - select (button 0)
+        if (this.buttons[0] && !this.lastButtons[0]) {
+            this.selectMenuItem();
+        }
+        
+        // B button - back (button 1)
+        if (this.buttons[1] && !this.lastButtons[1]) {
+            this.goBack();
+        }
+    },
+    
+    handleGameControls: function() {
+        // B button - jump (button 1)
+        if (this.buttons[1]) {
+            if (!Input.held) {
+                action(); // Initial jump press
             }
-            if (this.buttons[13] || this.axes[1] > 0.5) { // Down
-                this.navigateMenu(1);
-            }
-            if (this.buttons[14] || this.axes[0] < -0.5) { // Left
-                this.navigateMenu(-1, true);
-            }
-            if (this.buttons[15] || this.axes[0] > 0.5) { // Right
-                this.navigateMenu(1, true);
-            }
-            if (this.buttons[0]) { // A button - select
-                this.selectMenuItem();
-            }
-            if (this.buttons[1]) { // B button - back
-                this.goBack();
-            }
-            if (this.buttons[9]) { // Start/Plus button - pause/esc
-                if (Game.state === 'game') {
-                    UI.show('menu-pause');
-                } else {
-                    UI.home();
-                }
+            Input.held = true; // Continuous jump while holding
+        } else {
+            if (Input.held && !Input.mousePressed) {
+                release(); // Release jump when button released
             }
         }
         
-        if (Game.state === 'game') {
-            // Game controls
-            if (this.buttons[0] || this.buttons[1]) { // A or B button - jump
-                if (!Input.held) {
-                    action();
-                }
-                Input.held = true;
-            } else {
-                if (Input.held && !Input.mousePressed) {
-                    release();
-                }
-            }
-            
-            // Retry with Y button
-            if (this.buttons[3]) {
-                Game.retry();
-            }
-            
-            // Menu with Start button
-            if (this.buttons[9]) {
+        // Y button - retry (button 3)
+        if (this.buttons[3] && !this.lastButtons[3]) {
+            Game.retry();
+        }
+        
+        // X button - pause menu (button 2)
+        if (this.buttons[2] && !this.lastButtons[2]) {
+            if (Game.state === 'game') {
                 UI.show('menu-pause');
             }
         }
+    },
+    
+    handleEditorControls: function() {
+        // Show crosshair
+        const crosshair = document.getElementById('editor-crosshair');
+        crosshair.style.display = 'block';
+        
+        // Move cursor with left stick
+        this.editorCursorX += this.axes[0] * this.editorCursorSpeed;
+        this.editorCursorY += this.axes[1] * this.editorCursorSpeed;
+        
+        // Clamp cursor to screen
+        this.editorCursorX = Math.max(0, Math.min(window.innerWidth, this.editorCursorX));
+        this.editorCursorY = Math.max(0, Math.min(window.innerHeight, this.editorCursorY));
+        
+        // Update crosshair position
+        crosshair.style.left = (this.editorCursorX - 10) + 'px';
+        crosshair.style.top = (this.editorCursorY - 10) + 'px';
+        
+        // ZR/R2 - Place block (button 7)
+        if (this.buttons[7] && !this.lastButtons[7]) {
+            this.editorPlacing = true;
+            this.simulateEditorClick(this.editorCursorX, this.editorCursorY, false);
+        }
+        
+        // ZL/L2 - Destroy block (button 6)
+        if (this.buttons[6] && !this.lastButtons[6]) {
+            this.editorDestroying = true;
+            this.simulateEditorClick(this.editorCursorX, this.editorCursorY, true);
+        }
+        
+        // D-pad navigation through tools
+        if (this.buttons[14] && !this.lastButtons[14]) { // Left
+            this.navigateEditorTools(-1);
+        }
+        if (this.buttons[15] && !this.lastButtons[15]) { // Right
+            this.navigateEditorTools(1);
+        }
+        if (this.buttons[12] && !this.lastButtons[12]) { // Up
+            this.navigateEditorTools(-5);
+        }
+        if (this.buttons[13] && !this.lastButtons[13]) { // Down
+            this.navigateEditorTools(5);
+        }
+        
+        // X button - Test level (button 2)
+        if (this.buttons[2] && !this.lastButtons[2]) {
+            LevelEditor.testLevel();
+        }
+        
+        // Update tool highlight
+        this.updateEditorToolHighlight();
+    },
+    
+    simulateEditorClick: function(x, y, isRightClick = false) {
+        // Create a simulated mouse event for editor
+        const rect = Game.canvas.getBoundingClientRect();
+        const event = new MouseEvent(isRightClick ? 'contextmenu' : 'mousedown', {
+            clientX: x,
+            clientY: y,
+            bubbles: true,
+            cancelable: true
+        });
+        
+        // Dispatch to canvas
+        Game.canvas.dispatchEvent(event);
+        
+        // Small vibration feedback
+        if (this.gamepad.vibrationActuator && settings.gameplay.vibration) {
+            this.gamepad.vibrationActuator.playEffect("dual-rumble", {
+                startDelay: 0,
+                duration: 50,
+                weakMagnitude: 0.1,
+                strongMagnitude: 0.05
+            });
+        }
+    },
+    
+    navigateEditorTools: function(direction) {
+        const tools = document.querySelectorAll('.editor-tool');
+        if (tools.length === 0) return;
+        
+        this.editorToolIndex += direction;
+        if (this.editorToolIndex < 0) this.editorToolIndex = tools.length - 1;
+        if (this.editorToolIndex >= tools.length) this.editorToolIndex = 0;
+        
+        // Select the tool
+        tools[this.editorToolIndex].click();
+        this.editorToolChanged = true;
+        
+        // Vibration feedback
+        if (this.gamepad.vibrationActuator && settings.gameplay.vibration) {
+            this.gamepad.vibrationActuator.playEffect("dual-rumble", {
+                startDelay: 0,
+                duration: 30,
+                weakMagnitude: 0.05,
+                strongMagnitude: 0.02
+            });
+        }
+    },
+    
+    updateEditorToolHighlight: function() {
+        // Remove previous highlights
+        document.querySelectorAll('.editor-tool').forEach(tool => {
+            tool.classList.remove('controller-highlight');
+        });
+        
+        // Add highlight to current tool
+        const tools = document.querySelectorAll('.editor-tool');
+        if (tools.length > 0 && this.editorToolIndex < tools.length) {
+            tools[this.editorToolIndex].classList.add('controller-highlight');
+        }
+    },
+    
+    goHome: function() {
+        if (Game.state === 'editor' && Game.exitToEditor) {
+            Game.exitToEditor();
+        } else {
+            UI.home();
+        }
+        
+        // Hide crosshair if in editor
+        document.getElementById('editor-crosshair').style.display = 'none';
     },
     
     navigateMenu: function(direction, horizontal = false) {
@@ -2786,10 +3053,11 @@ const Controller = {
         }
     },
     
-    setDeadzone: function(value) {
+        setDeadzone: function(value) {
         this.deadzone = value / 100;
-    }
-};
+        // Set cursor speed based on deadzone (inverse relationship)
+        this.editorCursorSpeed = 15 - (value / 100 * 10);
+    },
 
 // --- IMPROVED GAME ENGINE WITH iPad MODE (UPDATE 3) ---
 const Game = {
@@ -3228,6 +3496,12 @@ const Game = {
     loop: function(timestamp) {
         // Update controller
         Controller.update();
+
+        if (Controller.editorToolChanged) {
+            setTimeout(() => {
+                Controller.editorToolChanged = false;
+            }, 100);
+        }
         
         // Calculate delta time
         if (!this.lastFrameTime) this.lastFrameTime = timestamp;
