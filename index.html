@@ -6,656 +6,421 @@
     <title>Neon Dash Play Unblocked!</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
-         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
-        
+        /* Base CSS remains the same but enhanced */
         :root {
-            /* EXTREMELY FLASHY/VIVID COLORS */
             --neon-blue: #00ffff;
-            --neon-pink: #ff00ff;
+            --neon-pink: #ff0088;
             --neon-green: #00ff00;
             --neon-yellow: #ffff00;
             --neon-orange: #ff8800;
-            --neon-purple: #ff00ff;
-            --neon-red: #ff0066;
-            --accent-green: #33ff00;
-            --bg-dark: #000011;
-            --ui-bg: linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(0,20,40,0.95) 100%);
-            --border-glow: 0 0 20px currentColor;
-            --player-main: var(--neon-blue);
-            --player-sec: var(--neon-pink);
+            --neon-red: #ff0000;
+            --neon-purple: #d000ff;
+            --player-main: #00ffff;
+            --player-sec: #ff0088;
+            --border-glow: 0 0 15px var(--neon-blue);
+            --button-glow: 0 0 20px currentColor;
+            --black-outline: 2px solid #000;
         }
-
-        body {
-            background: var(--bg-dark);
+        
+        * {
             margin: 0;
-            overflow: hidden;
-            font-family: 'Orbitron', sans-serif;
-            color: var(--neon-blue);
-            user-select: none;
-            cursor: default;
-        }
-
-        canvas {
-            display: block;
-            /* Improve canvas rendering for better performance */
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -webkit-crisp-edges;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
             image-rendering: pixelated;
             image-rendering: crisp-edges;
         }
-
-        .ui-layer {
-            position: absolute;
+        
+        body {
+            background: #000011;
+            color: var(--neon-blue);
+            overflow: hidden;
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        canvas {
+            display: block;
+            position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
+            z-index: 0;
+        }
+        
+        /* UI Layers */
+        .ui-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
+            background: rgba(0, 0, 20, 0.9);
             z-index: 100;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            background: radial-gradient(circle at center, rgba(0,255,255,0.1) 0%, transparent 70%);
-        }
-
-        .hidden { 
-            opacity: 0; 
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0;
             pointer-events: none;
-            transform: scale(1.1);
+            transform: scale(0.95);
         }
-        .visible { 
-            opacity: 1; 
-            pointer-events: auto;
+        
+        .ui-layer.visible {
+            opacity: 1;
+            pointer-events: all;
             transform: scale(1);
         }
-
-        .menu-box {
-            background: var(--ui-bg);
-            border: 3px solid var(--neon-blue);
-            box-shadow: 
-                0 0 30px var(--neon-blue),
-                inset 0 0 20px var(--neon-blue),
-                0 0 60px rgba(0, 255, 255, 0.3);
-            padding: 40px 30px;
-            border-radius: 20px;
-            text-align: center;
-            backdrop-filter: blur(10px); /* Reduced blur for performance */
-            max-width: 90%;
-            max-height: 90%;
-            overflow-y: auto;
-            animation: pulse-glow 2s infinite alternate;
-            position: relative;
+        
+        .ui-layer.hidden {
+            display: none;
         }
-
+        
+        /* Menu Box */
+        .menu-box {
+            background: rgba(0, 0, 30, 0.95);
+            border: 3px solid var(--neon-blue);
+            border-radius: 15px;
+            padding: 30px;
+            min-width: 320px;
+            max-width: 90vw;
+            text-align: center;
+            box-shadow: 0 0 50px var(--neon-blue), 0 0 100px rgba(0, 255, 255, 0.3);
+            position: relative;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+        
         .menu-box::before {
             content: '';
             position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 17px;
             background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green), var(--neon-yellow));
-            border-radius: 25px;
             z-index: -1;
-            animation: rotate-gradient 3s linear infinite;
-            opacity: 0.7;
+            filter: blur(10px);
+            opacity: 0.3;
         }
-
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 30px var(--neon-blue), inset 0 0 20px var(--neon-blue), 0 0 60px rgba(0, 255, 255, 0.3); }
-            100% { box-shadow: 0 0 50px var(--neon-pink), inset 0 0 30px var(--neon-pink), 0 0 80px rgba(255, 0, 255, 0.5); }
-        }
-
-        @keyframes rotate-gradient {
-            0% { filter: hue-rotate(0deg); }
-            100% { filter: hue-rotate(360deg); }
-        }
-
-        h1 {
-            color: transparent;
-            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green));
-            -webkit-background-clip: text;
-            background-clip: text;
-            text-shadow: 0 0 30px currentColor;
-            font-size: 3.5em;
+        
+        h1, h2, h3 {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
             margin-bottom: 20px;
-            font-weight: 900;
-            letter-spacing: 3px;
-            animation: text-shimmer 3s ease-in-out infinite alternate;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
-
-        @keyframes text-shimmer {
-            0% { filter: hue-rotate(0deg); }
-            100% { filter: hue-rotate(360deg); }
-        }
-
-        h2 {
-            color: transparent;
-            background: linear-gradient(45deg, var(--neon-yellow), var(--neon-orange));
-            -webkit-background-clip: text;
-            background-clip: text;
-            text-shadow: 0 0 20px currentColor;
-            font-size: 2.2em;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        h3 {
-            color: transparent;
-            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
-            -webkit-background-clip: text;
-            background-clip: text;
-            text-shadow: 0 0 15px currentColor;
-            font-size: 1.8em;
-            margin: 15px 0;
-            font-weight: 700;
-        }
-
-        button, .lvl-btn {
-            font-family: 'Orbitron', sans-serif;
-            background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,20,40,0.8) 100%);
+        
+        h1 { font-size: 2.5em; }
+        h2 { font-size: 2em; }
+        h3 { font-size: 1.5em; }
+        
+        /* Buttons */
+        button {
+            background: rgba(0, 0, 0, 0.8);
             color: var(--neon-blue);
             border: 2px solid var(--neon-blue);
             padding: 15px 25px;
-            margin: 12px;
+            margin: 10px;
+            font-size: 1.2em;
             cursor: pointer;
-            text-transform: uppercase;
-            font-size: 1.1em;
-            font-weight: 700;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--border-glow);
             border-radius: 10px;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
             letter-spacing: 1px;
-            min-width: 140px;
-        }
-
-        button::before, .lvl-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        button:hover::before, .lvl-btn:hover::before {
-            left: 100%;
-        }
-
-        button:hover:not(:disabled), .lvl-btn.unlocked:hover {
-            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-pink) 100%);
-            color: #000;
-            box-shadow: 0 0 40px var(--neon-blue), 0 0 80px var(--neon-pink);
-            transform: translateY(-3px) scale(1.05);
-            border-color: transparent;
-        }
-
-        button.pink, button.next {
-            border-color: var(--neon-pink);
-            color: var(--neon-pink);
-            box-shadow: var(--border-glow);
-        }
-
-        button.pink:hover, button.next:hover {
-            background: linear-gradient(135deg, var(--neon-pink) 0%, var(--neon-purple) 100%);
-            color: #000;
-            box-shadow: 0 0 40px var(--neon-pink), 0 0 80px var(--neon-purple);
-        }
-
-        button.green {
-            border-color: var(--neon-green);
-            color: var(--neon-green);
-            box-shadow: var(--border-glow);
-        }
-
-        button.green:hover {
-            background: linear-gradient(135deg, var(--neon-green) 0%, var(--neon-blue) 100%);
-            color: #000;
-            box-shadow: 0 0 40px var(--neon-green), 0 0 80px var(--neon-blue);
-        }
-
-        button:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        /* HUD */
-        #hud {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            display: none;
-            padding: 15px;
-            box-sizing: border-box;
-            z-index: 50;
-            color: var(--neon-blue);
-            text-shadow: 0 0 10px currentColor;
-            font-weight: 700;
-            pointer-events: none;
-        }
-
-        #prog-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 6px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-        }
-
-        #prog {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--neon-green), var(--neon-blue));
-            transition: width 0.1s linear;
-            box-shadow: 0 0 20px var(--accent-green);
+            font-weight: bold;
+            width: 250px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: var(--button-glow);
+            outline: var(--black-outline) !important;
             position: relative;
+            z-index: 1;
         }
-
-        #prog::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shine 1.5s infinite;
+        
+        button:hover, button:focus {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 40px var(--neon-blue);
+            transform: translateY(-2px);
         }
-
-        @keyframes shine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        
+        button.green { border-color: var(--neon-green); color: var(--neon-green); }
+        button.green:hover { background: var(--neon-green); }
+        
+        button.pink { border-color: var(--neon-pink); color: var(--neon-pink); }
+        button.pink:hover { background: var(--neon-pink); }
+        
+        button.red { border-color: var(--neon-red); color: var(--neon-red); }
+        button.red:hover { background: var(--neon-red); }
+        
+        button.yellow { border-color: var(--neon-yellow); color: var(--neon-yellow); }
+        button.yellow:hover { background: var(--neon-yellow); }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
         }
-
-        .hud-stats {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            font-size: 1.2em;
-            font-weight: 900;
-            background: rgba(0,0,0,0.7);
-            padding: 12px;
-            border-radius: 12px;
-            border: 2px solid var(--neon-blue);
-            box-shadow: var(--border-glow);
-        }
-        .hud-stats span { 
-            color: var(--neon-pink);
-            text-shadow: 0 0 10px var(--neon-pink);
-        }
-
-        .hud-progress {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 1.2em;
-            font-weight: 900;
-            background: rgba(0,0,0,0.7);
-            padding: 12px;
-            border-radius: 12px;
-            border: 2px solid var(--neon-green);
-            box-shadow: var(--border-glow);
-            color: var(--neon-green);
-            text-shadow: 0 0 10px var(--neon-green);
-        }
-
-        #msg, #tutorial-msg {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 3.5em;
-            color: transparent;
-            background: linear-gradient(45deg, var(--neon-green), var(--neon-yellow), var(--neon-orange));
-            -webkit-background-clip: text;
-            background-clip: text;
-            text-shadow: 0 0 30px currentColor;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            text-align: center;
-            font-weight: 900;
-            animation: text-pulse 2s infinite;
-        }
-
-        @keyframes text-pulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
-        }
-
-        #tutorial-msg {
-            font-size: 1.8em;
-            top: 30%;
-            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
-            -webkit-background-clip: text;
-            background-clip: text;
-        }
-
+        
         /* Level Grid */
         #lvl-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            margin: 30px 0;
-            max-width: 600px;
+            gap: 10px;
+            margin: 20px 0;
         }
         
         .lvl-btn {
-            width: 70px;
-            height: 70px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.6em;
-            margin: 0;
-            border-radius: 15px;
-            font-weight: 900;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .lvl-btn.unlocked {
-            background: linear-gradient(135deg, rgba(0,255,255,0.2), rgba(255,0,255,0.2));
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.8);
             border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 20px var(--neon-blue);
+            color: var(--neon-blue);
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--button-glow);
+            outline: var(--black-outline) !important;
+            position: relative;
+            z-index: 1;
         }
-
-        .lvl-btn.unlocked:hover {
-            background: linear-gradient(135deg, var(--neon-blue), var(--neon-pink));
-            transform: rotate(5deg) scale(1.1);
-            box-shadow: 0 0 40px var(--neon-blue), 0 0 60px var(--neon-pink);
+        
+        .lvl-btn.unlocked:hover, .lvl-btn:focus {
+            background: var(--neon-blue);
+            color: #000;
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--neon-blue);
         }
-
+        
         .lvl-btn.locked {
-            background: rgba(0, 0, 0, 0.5);
             border-color: #666;
             color: #666;
             cursor: not-allowed;
             box-shadow: none;
-            opacity: 0.5;
-        }
-
-        /* Shop UI */
-        #shop-content {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 30px;
-            max-width: 800px;
-            max-height: 500px;
-            overflow-y: auto;
-            padding: 15px;
-        }
-
-        .costume-item {
-            background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,20,40,0.8) 100%);
-            border: 3px solid var(--border-color);
-            padding: 20px;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
-            font-size: 1em;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .costume-item::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-green), var(--neon-yellow));
-            border-radius: 17px;
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .costume-item:hover::before {
-            opacity: 1;
-        }
-
-        .costume-item:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-        }
-
-        .costume-item.unlocked {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 20px var(--neon-green);
         }
         
-        .costume-item.equipped {
-            border-color: var(--neon-pink);
-            box-shadow: 0 0 30px var(--neon-pink), inset 0 0 20px var(--neon-pink);
-        }
-
-        .costume-preview {
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 12px;
-            background: rgba(0,0,0,0.5);
-            border: 2px solid currentColor;
-        }
-
-        .player-preview-cube {
-            width: 40px;
-            height: 40px;
-            border: 3px solid;
-            position: relative;
-            border-radius: 6px;
-        }
-
-        .cost {
-            margin-top: 10px;
-            color: var(--neon-pink);
-            font-weight: bold;
-            text-shadow: 0 0 8px var(--neon-pink);
-            font-size: 1.1em;
-        }
-
-        /* Mobile Controls */
-        #mobile-controls {
+        /* HUD */
+        #hud {
             position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 150px;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
+            top: 20px;
+            left: 20px;
+            z-index: 50;
+            color: white;
+            font-size: 1.5em;
+            text-shadow: 0 0 10px #000;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid var(--neon-blue);
+            box-shadow: var(--border-glow);
+            outline: var(--black-outline);
         }
-
-        .show-mobile #mobile-controls {
-            display: flex;
+        
+        .hud-stats {
+            margin-bottom: 10px;
         }
-
-        .mobile-btn {
-            background: linear-gradient(135deg, rgba(0,255,255,0.3), rgba(255,0,255,0.3));
-            border: 3px solid var(--neon-blue);
-            color: var(--neon-blue);
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2em;
-            opacity: 0.9;
-            box-shadow: 0 0 30px var(--neon-blue);
-            touch-action: manipulation;
-            transition: all 0.2s;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
+        
+        #prog-bar {
+            width: 200px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+            outline: var(--black-outline);
         }
-
-        .mobile-btn:active {
-            transform: scale(0.9);
-            box-shadow: 0 0 50px var(--neon-pink);
+        
+        #prog {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            transition: width 0.3s ease;
+            width: 0%;
         }
-
-        /* Level Editor Styles */
-        #editor-tools {
+        
+        #msg {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--neon-green);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 1.5em;
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 20px var(--neon-green);
+            transition: opacity 0.3s ease;
+            outline: var(--black-outline);
+            z-index: 50;
+        }
+        
+        #tutorial-msg {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: var(--neon-yellow);
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.3em;
+            border: 2px solid var(--neon-yellow);
+            box-shadow: 0 0 30px var(--neon-yellow);
+            text-align: center;
+            max-width: 80%;
+            outline: var(--black-outline);
+            z-index: 50;
+        }
+        
+        /* Mobile Controls */
+        #game-container {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: var(--ui-bg);
-            border-top: 3px solid var(--neon-blue);
-            padding: 8px;
+            height: 150px;
+            z-index: 40;
             display: none;
-            flex-wrap: wrap;
-            gap: 6px;
-            justify-content: center;
-            z-index: 200;
-            box-shadow: 0 -5px 30px rgba(0,255,255,0.3);
-            max-height: 150px;
-            overflow-y: auto;
-        }
-
-        .editor-tool {
-            width: 45px;
-            height: 45px;
-            background: rgba(0,0,0,0.7);
-            border: 2px solid var(--neon-blue);
-            border-radius: 6px;
-            display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
-            font-size: 1.1em;
-            transition: all 0.3s;
+            pointer-events: none;
         }
-
-        .editor-tool:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 15px var(--neon-blue);
-        }
-
-        .editor-tool.selected {
-            background: var(--neon-blue);
-            color: #000;
-            box-shadow: 0 0 20px var(--neon-blue);
-        }
-
-        .editor-controls {
+        
+        #game-container.show-mobile {
             display: flex;
-            gap: 6px;
-            margin-top: 6px;
-            width: 100%;
+        }
+        
+        .mobile-btn {
+            width: 120px;
+            height: 120px;
+            background: rgba(0, 255, 255, 0.3);
+            border: 3px solid var(--neon-blue);
+            border-radius: 50%;
+            color: white;
+            font-size: 2.5em;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            flex-wrap: wrap;
+            touch-action: manipulation;
+            user-select: none;
+            pointer-events: auto;
+            box-shadow: 0 0 30px var(--neon-blue);
+            outline: var(--black-outline);
         }
-
-        .editor-btn {
-            padding: 6px 12px;
-            font-size: 0.8em;
+        
+        .mobile-btn:active {
+            background: rgba(0, 255, 255, 0.7);
+            transform: scale(0.95);
         }
-
-        .editor-info {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: var(--neon-green);
-            background: rgba(0,0,0,0.7);
-            padding: 8px;
-            border-radius: 8px;
-            border: 2px solid var(--neon-green);
-            font-size: 0.8em;
-            z-index: 201;
-        }
-
-        /* Settings UI */
-        .settings-group {
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
+        
+        /* Shop Items */
+        .costume-item {
+            background: rgba(0, 0, 0, 0.7);
             border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            width: 180px;
+            text-align: center;
+            box-shadow: var(--border-glow);
+            outline: var(--black-outline);
         }
-
+        
+        .costume-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 30px var(--neon-pink);
+        }
+        
+        .costume-item.unlocked {
+            border-color: var(--neon-green);
+        }
+        
+        .costume-item.equipped {
+            border-color: var(--neon-yellow);
+            background: rgba(255, 255, 0, 0.1);
+        }
+        
+        .costume-preview {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 10px;
+            border: 3px solid;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            outline: var(--black-outline);
+        }
+        
+        .player-preview-cube {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            border: 3px solid;
+            outline: var(--black-outline);
+        }
+        
+        /* Settings */
+        .settings-group {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            outline: var(--black-outline);
+        }
+        
         .settings-item {
-            margin: 15px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            outline: var(--black-outline);
         }
-
+        
         .settings-label {
-            color: var(--neon-green);
-            font-size: 1.1em;
-            text-shadow: 0 0 5px var(--neon-green);
-        }
-
-        .settings-value {
-            color: var(--neon-yellow);
+            color: var(--neon-blue);
             font-weight: bold;
-            margin: 0 10px;
         }
-
-        .slider-container {
-            flex-grow: 1;
-            margin: 0 15px;
+        
+        .settings-value {
+            color: var(--neon-green);
+            font-weight: bold;
+            min-width: 80px;
+            text-align: center;
         }
-
-        .slider {
-            width: 100%;
-            height: 8px;
-            -webkit-appearance: none;
-            appearance: none;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
-            outline: none;
-            border-radius: 4px;
-        }
-
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--neon-green);
-            cursor: pointer;
-            box-shadow: 0 0 10px var(--neon-green);
-            border: 2px solid #000;
-        }
-
-        .slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--neon-green);
-            cursor: pointer;
-            box-shadow: 0 0 10px var(--neon-green);
-            border: 2px solid #000;
-        }
-
+        
+        /* Toggle Switch */
         .toggle-switch {
             position: relative;
             display: inline-block;
             width: 60px;
             height: 30px;
         }
-
+        
         .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-
+        
         .toggle-slider {
             position: absolute;
             cursor: pointer;
@@ -663,39 +428,130 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0,0,0,0.5);
-            border: 2px solid var(--neon-blue);
+            background-color: #333;
             transition: .4s;
             border-radius: 34px;
+            border: 2px solid var(--neon-blue);
+            outline: var(--black-outline);
         }
-
+        
         .toggle-slider:before {
             position: absolute;
             content: "";
             height: 22px;
             width: 22px;
-            left: 2px;
+            left: 4px;
             bottom: 2px;
-            background-color: var(--neon-green);
+            background-color: var(--neon-blue);
             transition: .4s;
             border-radius: 50%;
-            box-shadow: 0 0 5px var(--neon-green);
         }
-
+        
         input:checked + .toggle-slider {
-            background-color: rgba(0,255,255,0.2);
-            border-color: var(--neon-green);
+            background-color: var(--neon-blue);
         }
-
+        
         input:checked + .toggle-slider:before {
-            transform: translateX(30px);
+            transform: translateX(26px);
+            background-color: #000;
         }
-
-        /* Performance Mode Indicator */
+        
+        /* Sliders */
+        .slider-container {
+            margin: 10px 0 20px 0;
+        }
+        
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            outline: none;
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            outline: var(--black-outline);
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 30px;
+            height: 30px;
+            background: var(--neon-blue);
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #000;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000011;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(0, 255, 255, 0.3);
+            border-top: 8px solid var(--neon-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 30px;
+            box-shadow: 0 0 50px var(--neon-blue);
+            outline: var(--black-outline);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Screen Transition */
+        .screen-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 10000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .transition-active {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.95);
+        }
+        
+        /* Screen Shake */
+        .screen-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        
+        /* Performance Indicator */
         .performance-indicator {
             position: fixed;
-            top: 10px;
-            right: 10px;
+            bottom: 10px;
+            left: 10px;
             background: rgba(0,0,0,0.7);
             color: var(--neon-green);
             padding: 5px 10px;
@@ -704,81 +560,299 @@
             border: 1px solid var(--neon-green);
             z-index: 1000;
             display: none;
+            outline: var(--black-outline);
         }
-
-        /* Coin Counter for Editor */
+        
+        /* Editor Tools */
+        #editor-tools {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            border: 3px solid var(--neon-blue);
+            border-radius: 10px;
+            padding: 10px;
+            display: none;
+            gap: 10px;
+            z-index: 100;
+            box-shadow: 0 0 30px var(--neon-blue);
+            outline: var(--black-outline);
+        }
+        
+        .editor-tool-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid var(--neon-blue);
+            border-radius: 8px;
+            color: var(--neon-blue);
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            outline: var(--black-outline);
+        }
+        
+        .editor-tool-btn:hover, .editor-tool-btn.active {
+            background: var(--neon-blue);
+            color: #000;
+            transform: scale(1.1);
+        }
+        
         .editor-coin-counter {
             position: fixed;
-            top: 60px;
+            top: 10px;
             right: 10px;
             background: rgba(0,0,0,0.7);
             color: var(--neon-yellow);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.9em;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 1.2em;
             border: 2px solid var(--neon-yellow);
-            z-index: 201;
+            z-index: 100;
             display: none;
-            text-shadow: 0 0 5px var(--neon-yellow);
+            box-shadow: 0 0 20px var(--neon-yellow);
+            outline: var(--black-outline);
         }
-
-        /* Enhanced Transitions */
-        .enhanced-transition {
-            animation: enhancedTransition 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-
-        @keyframes enhancedTransition {
-            0% {
-                opacity: 0;
-                transform: translateY(30px) scale(0.95);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        /* Loading Screen */
-        #loading-screen {
+        
+        /* Editor Crosshair */
+        .editor-crosshair {
             position: fixed;
-            top: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            z-index: 60;
+            display: none;
+        }
+        
+        .crosshair-horizontal,
+        .crosshair-vertical {
+            position: absolute;
+            background: var(--neon-red);
+            box-shadow: 0 0 10px var(--neon-red);
+            outline: var(--black-outline);
+        }
+        
+        .crosshair-horizontal {
+            width: 40px;
+            height: 4px;
+            top: 50%;
             left: 0;
-            width: 100%;
+            transform: translateY(-50%);
+        }
+        
+        .crosshair-vertical {
+            width: 4px;
+            height: 40px;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* NEW: Achievement System */
+        .achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: -400px;
+            background: linear-gradient(90deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7));
+            border: 3px solid var(--neon-yellow);
+            border-radius: 15px;
+            padding: 20px;
+            width: 350px;
+            z-index: 1000;
+            transition: right 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 0 40px var(--neon-yellow);
+            outline: var(--black-outline);
+        }
+        
+        .achievement-popup.show {
+            right: 20px;
+        }
+        
+        .achievement-icon {
+            font-size: 2.5em;
+            float: left;
+            margin-right: 15px;
+        }
+        
+        .achievement-title {
+            color: var(--neon-yellow);
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .achievement-desc {
+            color: var(--neon-green);
+            font-size: 0.9em;
+        }
+        
+        .achievement-progress {
+            background: rgba(0,0,0,0.7);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+            border: 1px solid var(--neon-blue);
+            outline: var(--black-outline);
+        }
+        
+        .achievement-progress-bar {
             height: 100%;
-            background: var(--bg-dark);
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        /* NEW: Save System UI */
+        .save-system {
+            background: rgba(0,0,0,0.9);
+            border: 3px solid var(--neon-green);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 20px auto;
+            text-align: center;
+            box-shadow: 0 0 40px var(--neon-green);
+            outline: var(--black-outline);
+        }
+        
+        .save-slot {
+            background: rgba(0,0,0,0.7);
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            outline: var(--black-outline);
+        }
+        
+        .save-slot:hover {
+            border-color: var(--neon-green);
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px var(--neon-green);
+        }
+        
+        .save-slot.active {
+            border-color: var(--neon-yellow);
+            background: rgba(255,255,0,0.1);
+        }
+        
+        .save-slot-header {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .save-slot-title {
+            color: var(--neon-blue);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .save-slot-date {
+            color: var(--neon-green);
+            font-size: 0.9em;
+        }
+        
+        .save-slot-stats {
+            color: var(--neon-pink);
+            font-size: 0.9em;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        /* NEW: Leaderboard */
+        .leaderboard {
+            background: rgba(0,0,0,0.9);
+            border: 3px solid var(--neon-purple);
+            border-radius: 15px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px auto;
+            box-shadow: 0 0 40px var(--neon-purple);
+            outline: var(--black-outline);
+        }
+        
+        .leaderboard-entry {
+            background: rgba(0,0,0,0.7);
+            border: 1px solid var(--neon-blue);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 5px 0;
+            display: grid;
+            grid-template-columns: 50px 1fr 100px;
             align-items: center;
-            z-index: 10000;
-            transition: opacity 0.5s ease-out;
+            transition: all 0.3s ease;
+            outline: var(--black-outline);
         }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(0,255,255,0.3);
-            border-top: 4px solid var(--neon-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+        
+        .leaderboard-entry:hover {
+            transform: translateX(5px);
+            border-color: var(--neon-yellow);
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        
+        .leaderboard-rank {
+            color: var(--neon-yellow);
+            font-weight: bold;
+            font-size: 1.5em;
+            text-align: center;
         }
-
-        /* Screen Shake Effect */
-        .screen-shake {
-            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        
+        .leaderboard-name {
+            color: var(--neon-blue);
+            font-weight: bold;
+            font-size: 1.1em;
         }
-
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
+        
+        .leaderboard-score {
+            color: var(--neon-green);
+            font-weight: bold;
+            text-align: right;
+        }
+        
+        /* NEW: Time Trial Display */
+        .time-trial-display {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: var(--neon-orange);
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.5em;
+            border: 3px solid var(--neon-orange);
+            z-index: 50;
+            box-shadow: 0 0 30px var(--neon-orange);
+            display: none;
+            text-align: center;
+            outline: var(--black-outline);
+        }
+        
+        .time-trial-best {
+            color: var(--neon-green);
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+        
+        /* NEW: Accessibility Features */
+        .accessibility-high-contrast {
+            filter: contrast(2) brightness(1.2);
+        }
+        
+        .accessibility-large-text * {
+            font-size: 1.2em !important;
         }
         
         /* Add new styles for particle effects */
@@ -860,6 +934,7 @@
             border: 1px solid var(--neon-green);
             z-index: 1000;
             display: none;
+            outline: var(--black-outline);
         }
         
         /* iPad Mode Indicator */
@@ -877,12 +952,212 @@
             z-index: 1000;
             display: none;
             text-align: center;
+            outline: var(--black-outline);
         }
         
         /* Updated Settings */
         .settings-value {
             min-width: 60px;
             text-align: center;
+        }
+        
+        /* NEW: Achievement Menu */
+        .achievement-item {
+            background: rgba(0,0,0,0.7);
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            outline: var(--black-outline);
+        }
+        
+        .achievement-item.locked {
+            border-color: #666;
+            opacity: 0.7;
+        }
+        
+        .achievement-item.unlocked {
+            border-color: var(--neon-yellow);
+            box-shadow: 0 0 20px var(--neon-yellow);
+        }
+        
+        .achievement-item-icon {
+            font-size: 2em;
+            margin-right: 15px;
+            width: 60px;
+            text-align: center;
+        }
+        
+        .achievement-item-content {
+            flex: 1;
+        }
+        
+        .achievement-item-title {
+            color: var(--neon-blue);
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        
+        .achievement-item.locked .achievement-item-title {
+            color: #666;
+        }
+        
+        .achievement-item-desc {
+            color: var(--neon-green);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .achievement-item.locked .achievement-item-desc {
+            color: #888;
+        }
+        
+        .achievement-item-progress {
+            color: var(--neon-pink);
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        /* NEW: Sound Library */
+        .sound-item {
+            background: rgba(0,0,0,0.7);
+            border: 2px solid var(--neon-purple);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            outline: var(--black-outline);
+        }
+        
+        .sound-item:hover {
+            border-color: var(--neon-pink);
+            transform: translateY(-2px);
+        }
+        
+        .sound-item.active {
+            border-color: var(--neon-green);
+            background: rgba(0,255,0,0.1);
+        }
+        
+        .sound-item-preview {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 10px;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid currentColor;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+        
+        /* NEW: Level Rating */
+        .rating-stars {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 10px 0;
+        }
+        
+        .rating-star {
+            font-size: 2em;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .rating-star:hover {
+            transform: scale(1.2);
+        }
+        
+        .rating-star.active {
+            color: var(--neon-yellow);
+            text-shadow: 0 0 10px var(--neon-yellow);
+        }
+        
+        /* NEW: Game Modes */
+        .game-mode-item {
+            background: rgba(0,0,0,0.7);
+            border: 2px solid var(--neon-blue);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            outline: var(--black-outline);
+        }
+        
+        .game-mode-item:hover {
+            border-color: var(--neon-green);
+            transform: translateY(-5px);
+            box-shadow: 0 0 30px var(--neon-green);
+        }
+        
+        .game-mode-item.active {
+            border-color: var(--neon-yellow);
+            background: rgba(255,255,0,0.1);
+        }
+        
+        .game-mode-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .game-mode-difficulty {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .difficulty-easy { background: var(--neon-green); color: #000; }
+        .difficulty-medium { background: var(--neon-yellow); color: #000; }
+        .difficulty-hard { background: var(--neon-orange); color: #000; }
+        .difficulty-insane { background: var(--neon-red); color: #fff; }
+        
+        /* NEW: Controller Layout Display */
+        .controller-layout {
+            background: rgba(0,0,0,0.9);
+            border: 3px solid var(--neon-blue);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 0 40px var(--neon-blue);
+            outline: var(--black-outline);
+        }
+        
+        .controller-button {
+            display: inline-block;
+            width: 70px;
+            height: 70px;
+            background: rgba(0,0,0,0.8);
+            border: 3px solid var(--neon-blue);
+            border-radius: 50%;
+            margin: 10px;
+            font-weight: bold;
+            font-size: 1.2em;
+            line-height: 70px;
+            text-align: center;
+            color: var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+            outline: var(--black-outline);
+        }
+        
+        .controller-button.active {
+            background: var(--neon-blue);
+            color: #000;
         }
     </style>
 </head>
@@ -907,6 +1182,28 @@
 
     <!-- Editor Coin Counter -->
     <div class="editor-coin-counter" id="editor-coin-counter">Coins: 0/15</div>
+    
+    <!-- Editor Crosshair -->
+    <div class="editor-crosshair" id="editor-crosshair">
+        <div class="crosshair-horizontal"></div>
+        <div class="crosshair-vertical"></div>
+    </div>
+    
+    <!-- Time Trial Display -->
+    <div class="time-trial-display" id="time-trial-display">
+        <div id="time-trial-timer">00:00.00</div>
+        <div class="time-trial-best" id="time-trial-best">Best: --:--.--</div>
+    </div>
+    
+    <!-- Achievement Popup -->
+    <div class="achievement-popup" id="achievement-popup">
+        <div class="achievement-icon" id="achievement-icon">🏆</div>
+        <div class="achievement-title" id="achievement-title">Achievement Unlocked!</div>
+        <div class="achievement-desc" id="achievement-desc">Complete the first level</div>
+        <div class="achievement-progress">
+            <div class="achievement-progress-bar" id="achievement-progress-bar"></div>
+        </div>
+    </div>
 
     <div id="hud">
         <div class="hud-stats">
@@ -924,14 +1221,22 @@
     <!-- Main Menu -->
     <div id="menu-main" class="ui-layer visible">
         <div class="menu-box">
+            <h1>OFFICIAL GAME OF SALVADO</h1>
             <h1>NEON DASH</h1>
             <p style="font-size: 1.2em; color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green);">Levels unlocked: <span id="unlock-count">1</span>/50</p>
             <p style="font-size: 1.3em; color: var(--neon-yellow); text-shadow: 0 0 10px var(--neon-yellow);">Coins: <span id="menu-coins">0</span> 💰</p>
+            <p style="font-size: 1.1em; color: var(--neon-pink); margin: 10px 0;">Achievements: <span id="menu-achievements">0/50</span> 🏆</p>
             <button onclick="UI.startPlay()" class="green">PLAY</button>
             <button class="pink" onclick="UI.showShop()">CUSTOMIZE</button>
             <button class="pink" onclick="UI.showEditor()">LEVEL EDITOR</button>
             <button onclick="UI.showSettings()">SETTINGS</button>
             <button class="whats-new-btn" onclick="UI.showWhatsNew()">WHAT'S NEW?</button>
+            <button class="yellow" onclick="UI.showAchievements()">ACHIEVEMENTS 🏆</button>
+            <button onclick="UI.showGameModes()">GAME MODES</button>
+            <button onclick="UI.showSaveSystem()">SAVE/LOAD</button>
+            <button onclick="UI.showLeaderboard()">LEADERBOARDS</button>
+            <button onclick="UI.showSoundLibrary()">SOUND LIBRARY</button>
+            <button onclick="UI.showControllerLayout()">CONTROLLER LAYOUT</button>
         </div>
     </div>
 
@@ -943,6 +1248,17 @@
                 <button id="level-prev" onclick="UI.changeLevelPage(-1)">←</button>
                 <div id="lvl-grid"></div>
                 <button id="level-next" onclick="UI.changeLevelPage(1)">→</button>
+            </div>
+            <div id="level-rating" style="margin: 20px 0; display: none;">
+                <h3 style="color: var(--neon-yellow);">Rate This Level</h3>
+                <div class="rating-stars" id="rating-stars">
+                    <span class="rating-star" data-value="1">★</span>
+                    <span class="rating-star" data-value="2">★</span>
+                    <span class="rating-star" data-value="3">★</span>
+                    <span class="rating-star" data-value="4">★</span>
+                    <span class="rating-star" data-value="5">★</span>
+                </div>
+                <div id="level-rating-average" style="color: var(--neon-green); margin-top: 10px;"></div>
             </div>
             <button onclick="UI.home()">BACK TO MENU</button>
         </div>
@@ -963,8 +1279,10 @@
         <div class="menu-box">
             <h2 id="pause-title">PAUSED</h2>
             <p id="pause-p" style="color: var(--neon-yellow);">Press R to Retry</p>
-            <button id="pause-main-btn" onclick="Game.retry()">RETRY (R Key)</button>
+            <button id="pause-main-btn" onclick="Game.retry()">RETRY (Y Button)</button>
             <button class="pink" onclick="UI.home()">RETURN TO MENU</button>
+            <button class="yellow" onclick="UI.showSaveSystem()">SAVE GAME</button>
+            <button onclick="Achievements.showCurrentProgress()">VIEW ACHIEVEMENTS</button>
         </div>
     </div>
 
@@ -975,6 +1293,7 @@
             <p style="color: var(--neon-yellow);">Create your own levels!</p>
             <button onclick="LevelEditor.startNew()" class="green">NEW LEVEL</button>
             <button onclick="LevelEditor.load()" class="pink">LOAD LEVEL</button>
+            <button onclick="LevelEditor.showCloudLevels()">CLOUD LEVELS</button>
             <button onclick="UI.home()">BACK TO MENU</button>
         </div>
     </div>
@@ -988,7 +1307,7 @@
                 <h3>Graphics</h3>
                 <div class="settings-item">
                     <span class="settings-label">Quality:</span>
-                    <select id="quality-select" style="background: rgba(0,0,0,0.7); color: var(--neon-blue); border: 2px solid var(--neon-blue); padding: 5px; border-radius: 5px;">
+                    <select id="quality-select" style="background: rgba(0,0,0,0.7); color: var(--neon-blue); border: 2px solid var(--neon-blue); padding: 5px; border-radius: 5px; outline: var(--black-outline);">
                         <option value="low">Low</option>
                         <option value="medium">Medium</option>
                         <option value="high" selected>High</option>
@@ -1047,6 +1366,15 @@
                 <div class="slider-container">
                     <input type="range" min="0" max="100" value="50" class="slider" id="music-volume-slider">
                 </div>
+                <div class="settings-item">
+                    <span class="settings-label">Sound Pack:</span>
+                    <select id="sound-pack-select" style="background: rgba(0,0,0,0.7); color: var(--neon-purple); border: 2px solid var(--neon-purple); padding: 5px; border-radius: 5px; outline: var(--black-outline);">
+                        <option value="default">Default</option>
+                        <option value="retro">Retro</option>
+                        <option value="synth">Synthwave</option>
+                        <option value="chiptune">Chiptune</option>
+                    </select>
+                </div>
             </div>
 
             <div class="settings-group">
@@ -1079,6 +1407,13 @@
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
+                <div class="settings-item">
+                    <span class="settings-label">Time Trial Mode:</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="time-trial-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
             </div>
 
             <div class="settings-group">
@@ -1099,10 +1434,49 @@
                 </div>
                 <div class="settings-item">
                     <span class="settings-label">Controller Deadzone:</span>
-                    <span class="settings-value" id="deadzone-value">15%</span>
+                    <span class="settings-value" id="deadzone-value">8%</span>
                 </div>
                 <div class="slider-container">
-                    <input type="range" min="5" max="30" value="15" class="slider" id="deadzone-slider">
+                    <input type="range" min="1" max="20" value="8" class="slider" id="deadzone-slider">
+                </div>
+                <div class="settings-item">
+                    <span class="settings-label">Controller Sensitivity:</span>
+                    <span class="settings-value" id="controller-sensitivity-value">0.3</span>
+                </div>
+                <div class="slider-container">
+                    <input type="range" min="1" max="100" value="30" class="slider" id="controller-sensitivity-slider">
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <h3>Accessibility</h3>
+                <div class="settings-item">
+                    <span class="settings-label">High Contrast Mode:</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="high-contrast-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-item">
+                    <span class="settings-label">Large Text:</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="large-text-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-item">
+                    <span class="settings-label">Color Blind Mode:</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="colorblind-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="settings-item">
+                    <span class="settings-label">Reduced Motion:</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="reduced-motion-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
                 </div>
             </div>
 
@@ -1123,15 +1497,16 @@
                     </label>
                 </div>
                 <div class="settings-item">
-                    <span class="settings-label">Color Blind Mode:</span>
+                    <span class="settings-label">Show Button Borders:</span>
                     <label class="toggle-switch">
-                        <input type="checkbox" id="colorblind-toggle">
+                        <input type="checkbox" id="button-borders-toggle" checked>
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
             </div>
 
             <button onclick="UI.saveSettings()" class="green">SAVE SETTINGS</button>
+            <button onclick="UI.resetToDefaults()" class="red">RESET TO DEFAULTS</button>
             <button onclick="UI.home()">BACK TO MENU</button>
         </div>
     </div>
@@ -1141,19 +1516,146 @@
         <div class="menu-box">
             <h2>WHAT'S NEW</h2>
             <div style="text-align: left; max-width: 600px; margin: 20px auto;">
-                <h3 style="color: var(--neon-green);">Update v1.1</h3>
+                <h3 style="color: var(--neon-green);">Update v2.0 - Ultimate Edition</h3>
                 <ul style="color: var(--neon-blue); font-size: 1.1em; line-height: 1.6;">
-                    <li><strong>🎮 Controller Support:</strong> Full Bluetooth controller compatibility!</li>
-                    <li><strong>📱 iPad Mode:</strong> Optimized performance for iPad devices</li>
-                    <li><strong>✨ Enhanced Particles:</strong> Beautiful new particle effects</li>
-                    <li><strong>⚙️ Expanded Settings:</strong> More customization options</li>
-                    <li><strong>🔄 Improved Reset:</strong> Particles now clear properly on reset</li>
-                    <li><strong>🎨 Costume Rename:</strong> "Season 1 Special" skin updated</li>
-                    <li><strong>🔧 Performance:</strong> Various optimizations and fixes</li>
+                    <li><strong>🏆 Achievement System:</strong> 50+ achievements to unlock with progress tracking</li>
+                    <li><strong>💾 Enhanced Save System:</strong> Multiple save slots with cloud backup</li>
+                    <li><strong>🏆 Leaderboards:</strong> Global and friend leaderboards for all levels</li>
+                    <li><strong>⏱️ Time Trial Mode:</strong> Race against the clock with best time tracking</li>
+                    <li><strong>🎮 Advanced Controller Support:</strong> Full button mapping with improved sensitivity</li>
+                    <li><strong>🎨 Editor Crosshair:</strong> Precision editing with controller support</li>
+                    <li><strong>🌟 Level Rating System:</strong> Rate and review community levels</li>
+                    <li><strong>🎵 Sound Library:</strong> Multiple sound packs to choose from</li>
+                    <li><strong>♿ Accessibility Features:</strong> High contrast, large text, color blind modes</li>
+                    <li><strong>🎯 Multiple Game Modes:</strong> Endless, Challenge, Practice modes</li>
+                    <li><strong>📊 Enhanced Statistics:</strong> Detailed gameplay analytics</li>
+                    <li><strong>✨ Visual Improvements:</strong> Better particles, effects, and UI borders</li>
+                    <li><strong>🔧 Performance Optimizations:</strong> Even smoother gameplay on all devices</li>
                 </ul>
                 <p style="color: var(--neon-yellow); margin-top: 20px; font-size: 1.2em;">
-                    Enjoy the enhanced Neon Dash experience!
+                    Enjoy the ultimate Neon Dash experience!
                 </p>
+            </div>
+            <button onclick="UI.home()">BACK TO MENU</button>
+        </div>
+    </div>
+
+    <!-- Achievement Menu -->
+    <div id="menu-achievements" class="ui-layer hidden">
+        <div class="menu-box">
+            <h2>ACHIEVEMENTS 🏆</h2>
+            <p style="color: var(--neon-yellow); font-size: 1.2em; margin-bottom: 20px;">
+                Progress: <span id="achievements-progress">0/50</span> (<span id="achievements-percentage">0%</span>)
+            </p>
+            <div id="achievements-list" style="max-height: 400px; overflow-y: auto; padding: 10px;"></div>
+            <button onclick="UI.home()">BACK TO MENU</button>
+        </div>
+    </div>
+
+    <!-- Save System Menu -->
+    <div id="menu-savesystem" class="ui-layer hidden">
+        <div class="menu-box">
+            <h2>SAVE & LOAD</h2>
+            <div class="save-system">
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button onclick="SaveSystem.saveGame(1)" class="green">SAVE TO SLOT 1</button>
+                    <button onclick="SaveSystem.saveGame(2)" class="green">SAVE TO SLOT 2</button>
+                    <button onclick="SaveSystem.saveGame(3)" class="green">SAVE TO SLOT 3</button>
+                </div>
+                <div id="save-slots"></div>
+                <div style="margin-top: 20px;">
+                    <button onclick="SaveSystem.exportSave()" class="yellow">EXPORT SAVE DATA</button>
+                    <button onclick="SaveSystem.importSave()" class="yellow">IMPORT SAVE DATA</button>
+                    <button onclick="SaveSystem.cloudBackup()" class="pink">CLOUD BACKUP</button>
+                    <button onclick="SaveSystem.cloudRestore()" class="pink">CLOUD RESTORE</button>
+                </div>
+            </div>
+            <button onclick="UI.home()">BACK TO MENU</button>
+        </div>
+    </div>
+
+    <!-- Leaderboard Menu -->
+    <div id="menu-leaderboard" class="ui-layer hidden">
+        <div class="menu-box">
+            <h2>LEADERBOARDS</h2>
+            <div style="margin: 20px 0;">
+                <select id="leaderboard-type" style="background: rgba(0,0,0,0.7); color: var(--neon-purple); border: 2px solid var(--neon-purple); padding: 10px; border-radius: 10px; font-size: 1.1em; outline: var(--black-outline);">
+                    <option value="level">Level Completion</option>
+                    <option value="time">Best Times</option>
+                    <option value="coins">Most Coins</option>
+                    <option value="achievements">Achievements</option>
+                </select>
+                <select id="leaderboard-level" style="background: rgba(0,0,0,0.7); color: var(--neon-blue); border: 2px solid var(--neon-blue); padding: 10px; border-radius: 10px; font-size: 1.1em; margin-left: 10px; outline: var(--black-outline);">
+                    <option value="global">Global</option>
+                    <option value="friends">Friends</option>
+                </select>
+            </div>
+            <div class="leaderboard" id="leaderboard-content"></div>
+            <button onclick="UI.home()">BACK TO MENU</button>
+        </div>
+    </div>
+
+    <!-- Sound Library Menu -->
+    <div id="menu-soundlibrary" class="ui-layer hidden">
+        <div class="menu-box">
+            <h2>SOUND LIBRARY</h2>
+            <p style="color: var(--neon-yellow); margin-bottom: 20px;">Choose your sound pack</p>
+            <div id="sound-library-content" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;"></div>
+            <div style="margin-top: 30px;">
+                <button onclick="SoundLibrary.testSounds()" class="yellow">TEST SOUNDS</button>
+                <button onclick="UI.home()">BACK TO MENU</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Modes Menu -->
+    <div id="menu-gamemodes" class="ui-layer hidden">
+        <div class="menu-box">
+            <h2>GAME MODES</h2>
+            <div id="game-modes-content">
+                <!-- Game modes will be loaded here -->
+            </div>
+            <button onclick="UI.home()">BACK TO MENU</button>
+        </div>
+    </div>
+
+    <!-- Controller Layout Menu -->
+    <div id="menu-controllerlayout" class="ui-layer hidden">
+        <div class="menu-box">
+            <h2>CONTROLLER LAYOUT</h2>
+            <div class="controller-layout">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 30px;">
+                    <div class="controller-button" id="controller-button-a">A</div>
+                    <div class="controller-button" id="controller-button-b">B</div>
+                    <div class="controller-button" id="controller-button-x">X</div>
+                    <div class="controller-button" id="controller-button-y">Y</div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 30px;">
+                    <div class="controller-button" id="controller-button-lb">LB</div>
+                    <div class="controller-button" id="controller-button-rb">RB</div>
+                    <div class="controller-button" id="controller-button-lt">LT</div>
+                    <div class="controller-button" id="controller-button-rt">RT</div>
+                </div>
+                <div style="margin-bottom: 30px;">
+                    <div style="color: var(--neon-blue); margin-bottom: 10px;">D-Pad</div>
+                    <div style="display: inline-block; position: relative; width: 150px; height: 150px;">
+                        <div class="controller-button" style="position: absolute; top: 0; left: 50px;">↑</div>
+                        <div class="controller-button" style="position: absolute; bottom: 0; left: 50px;">↓</div>
+                        <div class="controller-button" style="position: absolute; top: 50px; left: 0;">←</div>
+                        <div class="controller-button" style="position: absolute; top: 50px; right: 0;">→</div>
+                    </div>
+                </div>
+                <div style="color: var(--neon-green); font-size: 1.1em; line-height: 1.6; text-align: left;">
+                    <p><strong>Game Controls:</strong></p>
+                    <p>🅰️ - Jump/Hold to Jump</p>
+                    <p>🅱️ - Dash/Special Action</p>
+                    <p>❌ - Test Level (Editor)</p>
+                    <p>🎮 - Retry</p>
+                    <p>📱 - Menu/Back</p>
+                    <p>D-Pad - Navigate/Move Crosshair</p>
+                    <p>LB/RB - Switch Blocks (Editor)</p>
+                    <p>LT/RT - Place/Destroy (Editor)</p>
+                </div>
             </div>
             <button onclick="UI.home()">BACK TO MENU</button>
         </div>
@@ -1170,38 +1672,9 @@
         </div>
     </div>
 
+    <!-- Level Editor Tools -->
     <div id="editor-tools">
-        <div class="editor-tool selected" data-type="0" title="Eraser">❌</div>
-        <div class="editor-tool" data-type="1" title="Block">⬜</div>
-        <div class="editor-tool" data-type="2" title="Spike">🔺</div>
-        <div class="editor-tool" data-type="3" title="Coin">🟡</div>
-        <div class="editor-tool" data-type="7" title="Jump Pad">🔵</div>
-        <div class="editor-tool" data-type="4" title="Ship Portal">🚀</div>
-        <div class="editor-tool" data-type="5" title="UFO Portal">🛸</div>
-        <div class="editor-tool" data-type="11" title="Wave Portal">🌊</div>
-        <div class="editor-tool" data-type="12" title="Robot Portal">🤖</div>
-        <div class="editor-tool" data-type="14" title="Swing Portal">🔄</div>
-        <div class="editor-tool" data-type="15" title="Dash Portal">💨</div>
-        <div class="editor-tool" data-type="16" title="Slow Portal">🐌</div>
-        <div class="editor-tool" data-type="9" title="Mini Portal">📏</div>
-        <div class="editor-tool" data-type="10" title="Macro Portal">📐</div>
-        <div class="editor-tool" data-type="13" title="Checkpoint">💾</div>
-        <div class="editor-tool" data-type="20" title="Moving Platform">🔄</div>
-        <div class="editor-tool" data-type="99" title="Goal">🎯</div>
-        <div class="editor-controls">
-            <button class="editor-btn green" onclick="LevelEditor.save()">SAVE</button>
-            <button class="editor-btn pink" onclick="LevelEditor.exportLevel()">EXPORT</button>
-            <button class="editor-btn" onclick="LevelEditor.importLevel()">IMPORT</button>
-            <button class="editor-btn" onclick="LevelEditor.testLevel()">TEST LEVEL</button>
-            <button class="editor-btn" onclick="LevelEditor.clearLevel()">CLEAR</button>
-            <button class="editor-btn" onclick="LevelEditor.exitEditor()">EXIT</button>
-        </div>
-        <div class="editor-info" id="editor-info">
-            Arrow Keys: Move Camera<br>
-            Click: Place/Erase<br>
-            Test: Play your level<br>
-            Coins Limit: 15 per level
-        </div>
+        <!-- Editor tools will be populated by JavaScript -->
     </div>
 
     <!-- Screen Transition Overlay -->
@@ -1232,6 +1705,7 @@ const CFG = {
     EDITOR_COIN_LIMIT: 15
 };
 
+// Game state
 let unlocked = parseInt(localStorage.getItem('nd_level') || 1);
 let totalCoins = parseInt(localStorage.getItem('nd_coins') || 0);
 let equippedSkinIndex = parseInt(localStorage.getItem('nd_equipped_skin') || 0);
@@ -1239,13 +1713,55 @@ let unlockedSkins = JSON.parse(localStorage.getItem('nd_skins') || '[0]');
 let tutorialDone = localStorage.getItem('nd_tutorial_done') === 'true';
 let currentPage = 1;
 
-// Settings
+// Enhanced settings with defaults
 let settings = JSON.parse(localStorage.getItem('nd_settings') || '{}');
-if (!settings.graphics) settings.graphics = { quality: 'high', particles: true, screenshake: true, ipadMode: false };
-if (!settings.audio) settings.audio = { volume: 70, sfx: true, music: true, musicVolume: 50 };
-if (!settings.gameplay) settings.gameplay = { mobileOpt: true, showFPS: false, vibration: true, autoRetry: false };
-if (!settings.controls) settings.controls = { sensitivity: 2, controller: true, deadzone: 15 };
-if (!settings.display) settings.display = { uiScale: 100, showTimer: false, colorblind: false };
+if (!settings.graphics) settings.graphics = { 
+    quality: 'high', 
+    particles: true, 
+    screenshake: true, 
+    ipadMode: false 
+};
+if (!settings.audio) settings.audio = { 
+    volume: 70, 
+    sfx: true, 
+    music: true, 
+    musicVolume: 50,
+    soundPack: 'default'
+};
+if (!settings.gameplay) settings.gameplay = { 
+    mobileOpt: true, 
+    showFPS: false, 
+    vibration: true, 
+    autoRetry: false,
+    timeTrial: false
+};
+if (!settings.controls) settings.controls = { 
+    sensitivity: 2, 
+    controller: true, 
+    deadzone: 8, // Lower default deadzone
+    controllerSensitivity: 0.3 // Lower default sensitivity
+};
+if (!settings.display) settings.display = { 
+    uiScale: 100, 
+    showTimer: false, 
+    colorblind: false,
+    buttonBorders: true,
+    highContrast: false,
+    largeText: false,
+    reducedMotion: false
+};
+if (!settings.saveSystem) settings.saveSystem = {
+    autoSave: true,
+    cloudBackup: false,
+    saveSlots: [{}, {}, {}]
+};
+
+// Apply button borders immediately
+if (settings.display.buttonBorders) {
+    document.documentElement.style.setProperty('--black-outline', '2px solid #000');
+} else {
+    document.documentElement.style.setProperty('--black-outline', 'none');
+}
 
 const THEMES = [
     ['C4', 200, 100],
@@ -1255,7 +1771,6 @@ const THEMES = [
     ['G4', 0, 90]
 ];
 
-// UPDATE 1: Renamed the most expensive costume
 const SKINS = [
     { name: 'Neon Blue', main: '#00ffff', secondary: '#ff0088', cost: 0 },
     { name: 'Matrix Green', main: '#33ff00', secondary: '#ff8800', cost: 50 },
@@ -1264,6 +1779,1114 @@ const SKINS = [
     { name: 'Dark Ops', main: '#333333', secondary: '#ffffff', cost: 200 },
     { name: 'Season 1 Special', main: '#ff00ff', secondary: '#00ffff', cost: 400 }
 ];
+
+// --- ACHIEVEMENT SYSTEM ---
+const Achievements = {
+    list: [
+        { id: 'first_jump', name: 'First Jump', desc: 'Make your first jump', icon: '🦘', points: 10, unlocked: false, progress: 0, maxProgress: 1 },
+        { id: 'first_coin', name: 'Coin Collector', desc: 'Collect your first coin', icon: '💰', points: 15, unlocked: false, progress: 0, maxProgress: 1 },
+        { id: 'first_level', name: 'Getting Started', desc: 'Complete Level 1', icon: '🚀', points: 20, unlocked: false, progress: 0, maxProgress: 1 },
+        { id: 'five_levels', name: 'Level Master', desc: 'Complete 5 levels', icon: '🎯', points: 50, unlocked: false, progress: 0, maxProgress: 5 },
+        { id: 'ten_coins', name: 'Rich Gamer', desc: 'Collect 10 coins', icon: '💎', points: 30, unlocked: false, progress: 0, maxProgress: 10 },
+        { id: 'fifty_jumps', name: 'Bouncy', desc: 'Perform 50 jumps', icon: '⚽', points: 25, unlocked: false, progress: 0, maxProgress: 50 },
+        { id: 'no_death', name: 'Perfect Run', desc: 'Complete a level without dying', icon: '👑', points: 100, unlocked: false, progress: 0, maxProgress: 1 },
+        { id: 'all_coins', name: 'Completionist', desc: 'Collect all coins in a level', icon: '🏆', points: 75, unlocked: false, progress: 0, maxProgress: 1 },
+        { id: 'dash_master', name: 'Speed Demon', desc: 'Use dash 10 times', icon: '⚡', points: 40, unlocked: false, progress: 0, maxProgress: 10 },
+        { id: 'mode_changer', name: 'Versatile', desc: 'Use all character modes', icon: '🔄', points: 60, unlocked: false, progress: 0, maxProgress: 6 },
+        { id: 'checkpoint_saver', name: 'Safety First', desc: 'Use 5 checkpoints', icon: '💾', points: 35, unlocked: false, progress: 0, maxProgress: 5 },
+        { id: 'skin_collector', name: 'Fashionista', desc: 'Unlock 3 skins', icon: '👕', points: 45, unlocked: false, progress: 0, maxProgress: 3 },
+        { id: 'fast_runner', name: 'Speedrun', desc: 'Complete a level in under 30 seconds', icon: '⏱️', points: 80, unlocked: false, progress: 0, maxProgress: 1 },
+        { id: 'chain_jumper', name: 'Air Time', desc: 'Perform 5 jumps in a row without touching ground', icon: '🪽', points: 55, unlocked: false, progress: 0, maxProgress: 1 },
+        { id: 'editor_master', name: 'Creator', desc: 'Create a level in editor', icon: '🛠️', points: 70, unlocked: false, progress: 0, maxProgress: 1 },
+        { id: 'gravity_defier', name: 'Upside Down', desc: 'Complete a level with reversed gravity', icon: '🌀', points: 90, unlocked: false, progress: 0, maxProgress: 1 },
+        { id: 'wave_rider', name: 'Wave Master', desc: 'Travel 500 units in wave mode', icon: '🌊', points: 65, unlocked: false, progress: 0, maxProgress: 500 },
+        { id: 'ship_pilot', name: 'Space Explorer', desc: 'Travel 1000 units in ship mode', icon: '🚀', points: 85, unlocked: false, progress: 0, maxProgress: 1000 },
+        { id: 'ufo_expert', name: 'Alien Tech', desc: 'Travel 800 units in UFO mode', icon: '👽', points: 75, unlocked: false, progress: 0, maxProgress: 800 },
+        { id: 'robot_walker', name: 'Robotic', desc: 'Travel 600 units in robot mode', icon: '🤖', points: 70, unlocked: false, progress: 0, maxProgress: 600 },
+        { id: 'swing_king', name: 'Tarzan', desc: 'Use swing mode 10 times', icon: '🦍', points: 60, unlocked: false, progress: 0, maxProgress: 10 },
+        { id: 'mini_macro', name: 'Size Changer', desc: 'Use both mini and macro modes', icon: '📏', points: 45, unlocked: false, progress: 0, maxProgress: 2 },
+        { id: 'slow_mo', name: 'Matrix', desc: 'Use slow motion 5 times', icon: '🐌', points: 40, unlocked: false, progress: 0, maxProgress: 5 },
+        { id: 'spike_dodger', name: 'Ninja', desc: 'Dodge 20 spikes', icon: '🗡️', points: 50, unlocked: false, progress: 0, maxProgress: 20 },
+        { id: 'pad_jumper', name: 'Trampoline', desc: 'Use 10 jump pads', icon: '🦘', points: 35, unlocked: false, progress: 0, maxProgress: 10 },
+        { id: 'portal_traveler', name: 'Portal Master', desc: 'Go through 15 portals', icon: '🌀', points: 55, unlocked: false, progress: 0, maxProgress: 15 },
+        { id: 'level_10', name: 'Decade', desc: 'Complete Level 10', icon: '🔟', points: 100, unlocked: false, progress: 0, maxProgress: 1 },
+        { id: 'level_25', name: 'Quarter Century', desc: 'Complete Level 25', icon: '2️⃣5️⃣', points: 250, unlocked: false, progress: 0, maxProgress: 1 },
+        { id: 'level_50', name: 'Golden Master', desc: 'Complete all 50 levels', icon: '5️⃣0️⃣', points: 500, unlocked: false, progress: 0, maxProgress: 1 },
+        { id: 'coin_100', name: 'Century', desc: 'Collect 100 coins', icon: '💯', points: 150, unlocked: false, progress: 0, maxProgress: 100 },
+        { id: 'coin_500', name: 'Half Thousand', desc: 'Collect 500 coins', icon: '5️⃣0️⃣0️⃣', points: 300, unlocked: false, progress: 0, maxProgress: 500 },
+        { id: 'coin_1000', name: 'Millennium', desc: 'Collect 1000 coins', icon: '1️⃣0️⃣0️⃣0️⃣', points: 500, unlocked: false, progress: 0, maxProgress: 1000 },
+        { id: 'attempt_100', name: 'Persistent', desc: 'Make 100 attempts', icon: '💪', points: 75, unlocked: false, progress: 0, maxProgress: 100 },
+        { id: 'attempt_500', name: 'Determined', desc: 'Make 500 attempts', icon: '🔥', points: 150, unlocked: false, progress: 0, maxProgress: 500 },
+        { id: 'attempt_1000', name: 'Unstoppable', desc: 'Make 1000 attempts', icon: '⚡', points: 250, unlocked: false, progress: 0, maxProgress: 1000 },
+        { id: 'time_1h', name: 'Hour Played', desc: 'Play for 1 hour', icon: '⏰', points: 100, unlocked: false, progress: 0, maxProgress: 3600 },
+        { id: 'time_5h', name: 'Marathon', desc: 'Play for 5 hours', icon: '🏃', points: 200, unlocked: false, progress: 0, maxProgress: 18000 },
+        { id: 'time_10h', name: 'Veteran', desc: 'Play for 10 hours', icon: '🎖️', points: 300, unlocked: false, progress: 0, maxProgress: 36000 },
+        { id: 'shop_spender', name: 'Big Spender', desc: 'Spend 1000 coins in shop', icon: '💸', points: 200, unlocked: false, progress: 0, maxProgress: 1000 },
+        { id: 'all_skins', name: 'Fashion King', desc: 'Unlock all skins', icon: '👑', points: 400, unlocked: false, progress: 0, maxProgress: SKINS.length },
+        { id: 'editor_10', name: 'Prolific Creator', desc: 'Create 10 levels', icon: '🎨', points: 300, unlocked: false, progress: 0, maxProgress: 10 },
+        { id: 'rating_giver', name: 'Critic', desc: 'Rate 5 levels', icon: '⭐', points: 75, unlocked: false, progress: 0, maxProgress: 5 },
+        { id: 'leaderboard_top', name: 'Champion', desc: 'Reach top 10 in any leaderboard', icon: '🏅', points: 200, unlocked: false, progress: 0, maxProgress: 1 },
+        { id: 'time_trial', name: 'Speedster', desc: 'Complete 5 time trials', icon: '⚡', points: 150, unlocked: false, progress: 0, maxProgress: 5 },
+        { id: 'endless_500', name: 'Endless Runner', desc: 'Score 500 in endless mode', icon: '∞', points: 175, unlocked: false, progress: 0, maxProgress: 500 },
+        { id: 'challenge_complete', name: 'Challenge Accepted', desc: 'Complete 10 challenges', icon: '🎯', points: 225, unlocked: false, progress: 0, maxProgress: 10 },
+        { id: 'practice_master', name: 'Practiced', desc: 'Use practice mode 5 times', icon: '📚', points: 100, unlocked: false, progress: 0, maxProgress: 5 },
+        { id: 'controller_user', name: 'Pro Gamer', desc: 'Play with controller for 1 hour', icon: '🎮', points: 125, unlocked: false, progress: 0, maxProgress: 3600 },
+        { id: 'mobile_user', name: 'On the Go', desc: 'Play on mobile for 30 minutes', icon: '📱', points: 100, unlocked: false, progress: 0, maxProgress: 1800 },
+        { id: 'secret_finder', name: 'Explorer', desc: 'Find a secret area', icon: '🗝️', points: 500, unlocked: false, progress: 0, maxProgress: 1 }
+    ],
+    
+    stats: {
+        totalJumps: 0,
+        totalCoins: 0,
+        totalDeaths: 0,
+        totalDistance: 0,
+        totalTime: 0,
+        levelsCompleted: 0,
+        dashUses: 0,
+        modeChanges: 0,
+        checkpointsUsed: 0,
+        spikesDodged: 0,
+        padsUsed: 0,
+        portalsUsed: 0
+    },
+    
+    init: function() {
+        // Load achievements from localStorage
+        const saved = localStorage.getItem('nd_achievements');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                this.list = data.list || this.list;
+                this.stats = data.stats || this.stats;
+            } catch(e) {
+                console.warn("Failed to load achievements:", e);
+            }
+        }
+        
+        // Update achievement progress
+        this.updateProgress();
+    },
+    
+    updateProgress: function() {
+        // Update achievement progress based on stats
+        this.list.forEach(ach => {
+            switch(ach.id) {
+                case 'first_jump':
+                    ach.progress = this.stats.totalJumps > 0 ? 1 : 0;
+                    break;
+                case 'first_coin':
+                    ach.progress = this.stats.totalCoins > 0 ? 1 : 0;
+                    break;
+                case 'five_levels':
+                    ach.progress = Math.min(this.stats.levelsCompleted, 5);
+                    break;
+                case 'ten_coins':
+                    ach.progress = Math.min(this.stats.totalCoins, 10);
+                    break;
+                case 'fifty_jumps':
+                    ach.progress = Math.min(this.stats.totalJumps, 50);
+                    break;
+                case 'dash_master':
+                    ach.progress = Math.min(this.stats.dashUses, 10);
+                    break;
+                case 'mode_changer':
+                    ach.progress = Math.min(this.stats.modeChanges, 6);
+                    break;
+                case 'checkpoint_saver':
+                    ach.progress = Math.min(this.stats.checkpointsUsed, 5);
+                    break;
+                case 'skin_collector':
+                    ach.progress = Math.min(unlockedSkins.length, 3);
+                    break;
+                case 'wave_rider':
+                    ach.progress = Math.min(this.stats.totalDistance, 500);
+                    break;
+                case 'ship_pilot':
+                    ach.progress = Math.min(this.stats.totalDistance, 1000);
+                    break;
+                case 'ufo_expert':
+                    ach.progress = Math.min(this.stats.totalDistance, 800);
+                    break;
+                case 'robot_walker':
+                    ach.progress = Math.min(this.stats.totalDistance, 600);
+                    break;
+                case 'swing_king':
+                    ach.progress = Math.min(this.stats.modeChanges, 10);
+                    break;
+                case 'spike_dodger':
+                    ach.progress = Math.min(this.stats.spikesDodged, 20);
+                    break;
+                case 'pad_jumper':
+                    ach.progress = Math.min(this.stats.padsUsed, 10);
+                    break;
+                case 'portal_traveler':
+                    ach.progress = Math.min(this.stats.portalsUsed, 15);
+                    break;
+                case 'coin_100':
+                    ach.progress = Math.min(this.stats.totalCoins, 100);
+                    break;
+                case 'coin_500':
+                    ach.progress = Math.min(this.stats.totalCoins, 500);
+                    break;
+                case 'coin_1000':
+                    ach.progress = Math.min(this.stats.totalCoins, 1000);
+                    break;
+                case 'attempt_100':
+                    ach.progress = Math.min(this.stats.totalDeaths, 100);
+                    break;
+                case 'attempt_500':
+                    ach.progress = Math.min(this.stats.totalDeaths, 500);
+                    break;
+                case 'attempt_1000':
+                    ach.progress = Math.min(this.stats.totalDeaths, 1000);
+                    break;
+                case 'time_1h':
+                    ach.progress = Math.min(this.stats.totalTime, 3600);
+                    break;
+                case 'time_5h':
+                    ach.progress = Math.min(this.stats.totalTime, 18000);
+                    break;
+                case 'time_10h':
+                    ach.progress = Math.min(this.stats.totalTime, 36000);
+                    break;
+                case 'shop_spender':
+                    ach.progress = Math.min(totalCoins, 1000);
+                    break;
+                case 'all_skins':
+                    ach.progress = Math.min(unlockedSkins.length, SKINS.length);
+                    break;
+            }
+            
+            // Check if achievement is unlocked
+            if (!ach.unlocked && ach.progress >= ach.maxProgress) {
+                this.unlock(ach.id);
+            }
+        });
+        
+        this.save();
+        this.updateDisplay();
+    },
+    
+    unlock: function(achievementId) {
+        const ach = this.list.find(a => a.id === achievementId);
+        if (ach && !ach.unlocked) {
+            ach.unlocked = true;
+            ach.unlockedAt = Date.now();
+            
+            // Show popup
+            this.showPopup(ach);
+            
+            // Award points/coins
+            totalCoins += ach.points;
+            Game.updateCoinDisplay();
+            
+            // Save immediately
+            this.save();
+            
+            // Play unlock sound
+            if (settings.audio.sfx) {
+                AUDIO.playTone(1500, 'sine', 0.5, 0.7);
+                AUDIO.playTone(2000, 'sine', 0.5, 0.5);
+            }
+            
+            console.log(`Achievement unlocked: ${ach.name}!`);
+        }
+    },
+    
+    showPopup: function(achievement) {
+        const popup = document.getElementById('achievement-popup');
+        const icon = document.getElementById('achievement-icon');
+        const title = document.getElementById('achievement-title');
+        const desc = document.getElementById('achievement-desc');
+        const progressBar = document.getElementById('achievement-progress-bar');
+        
+        icon.textContent = achievement.icon;
+        title.textContent = achievement.name;
+        desc.textContent = achievement.desc;
+        progressBar.style.width = '100%';
+        
+        popup.classList.add('show');
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            popup.classList.remove('show');
+        }, 5000);
+    },
+    
+    incrementStat: function(stat, amount = 1) {
+        if (this.stats[stat] !== undefined) {
+            this.stats[stat] += amount;
+            this.updateProgress();
+        }
+    },
+    
+    save: function() {
+        localStorage.setItem('nd_achievements', JSON.stringify({
+            list: this.list,
+            stats: this.stats
+        }));
+    },
+    
+    getUnlockedCount: function() {
+        return this.list.filter(a => a.unlocked).length;
+    },
+    
+    getTotalPoints: function() {
+        return this.list.filter(a => a.unlocked).reduce((sum, a) => sum + a.points, 0);
+    },
+    
+    updateDisplay: function() {
+        const unlockedCount = this.getUnlockedCount();
+        const totalCount = this.list.length;
+        const percentage = Math.round((unlockedCount / totalCount) * 100);
+        
+        if (document.getElementById('menu-achievements')) {
+            document.getElementById('menu-achievements').textContent = `${unlockedCount}/${totalCount}`;
+        }
+        
+        if (document.getElementById('achievements-progress')) {
+            document.getElementById('achievements-progress').textContent = `${unlockedCount}/${totalCount}`;
+            document.getElementById('achievements-percentage').textContent = `${percentage}%`;
+        }
+    },
+    
+    showCurrentProgress: function() {
+        const unlocked = this.getUnlockedCount();
+        const total = this.list.length;
+        const points = this.getTotalPoints();
+        
+        Game.showTutorialMessage(`Achievements: ${unlocked}/${total} | Points: ${points}`, 3000);
+    },
+    
+    renderList: function() {
+        const container = document.getElementById('achievements-list');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        // Sort: unlocked first, then by progress, then by points
+        const sorted = [...this.list].sort((a, b) => {
+            if (a.unlocked !== b.unlocked) return b.unlocked - a.unlocked;
+            if (a.progress !== b.progress) return b.progress - a.progress;
+            return b.points - a.points;
+        });
+        
+        sorted.forEach(ach => {
+            const item = document.createElement('div');
+            item.className = `achievement-item ${ach.unlocked ? 'unlocked' : 'locked'}`;
+            
+            const progressPercent = Math.round((ach.progress / ach.maxProgress) * 100);
+            
+            item.innerHTML = `
+                <div class="achievement-item-icon">${ach.icon}</div>
+                <div class="achievement-item-content">
+                    <div class="achievement-item-title">${ach.name}</div>
+                    <div class="achievement-item-desc">${ach.desc}</div>
+                    <div class="achievement-item-progress">
+                        ${ach.unlocked ? '✅ UNLOCKED' : `${progressPercent}% • ${ach.progress}/${ach.maxProgress}`}
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(item);
+        });
+    }
+};
+
+// --- SAVE SYSTEM ---
+const SaveSystem = {
+    currentSlot: 1,
+    slots: [null, null, null, null, null], // 5 slots
+    
+    init: function() {
+        this.loadSlots();
+    },
+    
+    saveGame: function(slot = this.currentSlot) {
+        if (slot < 1 || slot > 5) return;
+        
+        const saveData = {
+            timestamp: Date.now(),
+            date: new Date().toISOString(),
+            level: Game.currLvlIdx,
+            coins: totalCoins,
+            unlocked: unlocked,
+            skins: unlockedSkins,
+            equippedSkin: equippedSkinIndex,
+            achievements: Achievements.list.filter(a => a.unlocked).map(a => a.id),
+            stats: Achievements.stats,
+            playerState: {
+                x: Player.x,
+                y: Player.y,
+                mode: Player.mode,
+                scale: Player.scale
+            },
+            levelState: JSON.parse(JSON.stringify(Game.level)),
+            attempts: Game.att,
+            checkpoint: Game.currentCheckpoint
+        };
+        
+        this.slots[slot - 1] = saveData;
+        localStorage.setItem(`nd_save_slot_${slot}`, JSON.stringify(saveData));
+        
+        Game.showTutorialMessage(`Game saved to Slot ${slot}!`, 2000);
+        
+        // Update UI
+        this.updateSlotDisplay();
+    },
+    
+    loadGame: function(slot) {
+        if (slot < 1 || slot > 5 || !this.slots[slot - 1]) return false;
+        
+        const saveData = this.slots[slot - 1];
+        
+        // Load basic data
+        Game.currLvlIdx = saveData.level || 0;
+        totalCoins = saveData.coins || 0;
+        unlocked = saveData.unlocked || 1;
+        unlockedSkins = saveData.skins || [0];
+        equippedSkinIndex = saveData.equippedSkin || 0;
+        
+        // Load achievements
+        if (saveData.achievements) {
+            Achievements.list.forEach(ach => {
+                ach.unlocked = saveData.achievements.includes(ach.id);
+            });
+        }
+        
+        // Load stats
+        if (saveData.stats) {
+            Achievements.stats = { ...Achievements.stats, ...saveData.stats };
+        }
+        
+        // Load player state if in game
+        if (Game.state === 'game' && saveData.playerState) {
+            Player.x = saveData.playerState.x;
+            Player.y = saveData.playerState.y;
+            Player.mode = saveData.playerState.mode;
+            Player.scale = saveData.playerState.scale;
+            Player.updateSize(Player.scale);
+        }
+        
+        // Load level state
+        if (saveData.levelState) {
+            Game.level = JSON.parse(JSON.stringify(saveData.levelState));
+        }
+        
+        // Load checkpoint
+        Game.currentCheckpoint = saveData.checkpoint;
+        
+        // Update displays
+        Game.updateCoinDisplay();
+        Player.loadColors();
+        document.getElementById('unlock-count').innerText = unlocked;
+        Achievements.updateDisplay();
+        
+        Game.showTutorialMessage(`Game loaded from Slot ${slot}!`, 2000);
+        
+        return true;
+    },
+    
+    loadSlots: function() {
+        for (let i = 1; i <= 5; i++) {
+            const saved = localStorage.getItem(`nd_save_slot_${i}`);
+            if (saved) {
+                try {
+                    this.slots[i - 1] = JSON.parse(saved);
+                } catch(e) {
+                    console.warn(`Failed to load save slot ${i}:`, e);
+                }
+            }
+        }
+        this.updateSlotDisplay();
+    },
+    
+    updateSlotDisplay: function() {
+        const container = document.getElementById('save-slots');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        this.slots.forEach((slot, index) => {
+            const slotNum = index + 1;
+            const slotEl = document.createElement('div');
+            slotEl.className = 'save-slot';
+            if (slot && slot.timestamp === this.slots[this.currentSlot - 1]?.timestamp) {
+                slotEl.classList.add('active');
+            }
+            
+            if (slot) {
+                const date = new Date(slot.timestamp);
+                slotEl.innerHTML = `
+                    <div class="save-slot-header">
+                        <div class="save-slot-title">Slot ${slotNum}</div>
+                        <div class="save-slot-date">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</div>
+                    </div>
+                    <div class="save-slot-stats">
+                        <div>Level: ${(slot.level || 0) + 1}</div>
+                        <div>Coins: ${slot.coins || 0}</div>
+                        <div>Progress: ${Math.round(((slot.level || 0) + 1) / CFG.TOTAL_LEVELS * 100)}%</div>
+                    </div>
+                `;
+                
+                slotEl.onclick = () => {
+                    this.currentSlot = slotNum;
+                    this.loadGame(slotNum);
+                    this.updateSlotDisplay();
+                };
+            } else {
+                slotEl.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #666;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">📁</div>
+                        <div>Empty Slot ${slotNum}</div>
+                    </div>
+                `;
+                
+                slotEl.onclick = () => {
+                    this.currentSlot = slotNum;
+                    this.updateSlotDisplay();
+                };
+            }
+            
+            container.appendChild(slotEl);
+        });
+    },
+    
+    exportSave: function() {
+        const allData = {
+            slots: this.slots,
+            achievements: Achievements.list,
+            stats: Achievements.stats,
+            settings: settings,
+            version: '2.0'
+        };
+        
+        const dataStr = JSON.stringify(allData);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = `neon-dash-save-${Date.now()}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+        
+        Game.showTutorialMessage('Save data exported!', 2000);
+    },
+    
+    importSave: function() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const imported = JSON.parse(event.target.result);
+                    
+                    // Validate version
+                    if (imported.version !== '2.0') {
+                        alert('Invalid save file version. Please export from v2.0 or later.');
+                        return;
+                    }
+                    
+                    // Import data
+                    if (imported.slots) {
+                        imported.slots.forEach((slot, index) => {
+                            if (slot) {
+                                localStorage.setItem(`nd_save_slot_${index + 1}`, JSON.stringify(slot));
+                            }
+                        });
+                    }
+                    
+                    if (imported.achievements) {
+                        Achievements.list = imported.achievements;
+                    }
+                    
+                    if (imported.stats) {
+                        Achievements.stats = imported.stats;
+                    }
+                    
+                    if (imported.settings) {
+                        settings = imported.settings;
+                        localStorage.setItem('nd_settings', JSON.stringify(settings));
+                        Game.loadSettings();
+                    }
+                    
+                    // Reload
+                    this.loadSlots();
+                    Achievements.save();
+                    Achievements.updateDisplay();
+                    
+                    Game.showTutorialMessage('Save data imported successfully!', 3000);
+                } catch(error) {
+                    alert('Failed to import save file: ' + error.message);
+                }
+            };
+            
+            reader.readAsText(file);
+        };
+        
+        input.click();
+    },
+    
+    cloudBackup: function() {
+        // Simulated cloud backup (in real implementation, this would use a server)
+        const backupData = {
+            slots: this.slots.filter(slot => slot !== null),
+            achievements: Achievements.list,
+            stats: Achievements.stats,
+            timestamp: Date.now()
+        };
+        
+        localStorage.setItem('nd_cloud_backup', JSON.stringify(backupData));
+        
+        Game.showTutorialMessage('Cloud backup created!', 2000);
+    },
+    
+    cloudRestore: function() {
+        const backup = localStorage.getItem('nd_cloud_backup');
+        if (!backup) {
+            alert('No cloud backup found!');
+            return;
+        }
+        
+        if (confirm('Restore from cloud backup? This will overwrite current save data.')) {
+            try {
+                const backupData = JSON.parse(backup);
+                
+                // Restore slots
+                backupData.slots.forEach((slot, index) => {
+                    if (slot && index < 5) {
+                        localStorage.setItem(`nd_save_slot_${index + 1}`, JSON.stringify(slot));
+                    }
+                });
+                
+                // Restore achievements
+                if (backupData.achievements) {
+                    Achievements.list = backupData.achievements;
+                }
+                
+                if (backupData.stats) {
+                    Achievements.stats = backupData.stats;
+                }
+                
+                // Reload
+                this.loadSlots();
+                Achievements.save();
+                Achievements.updateDisplay();
+                
+                Game.showTutorialMessage('Cloud restore completed!', 3000);
+            } catch(error) {
+                alert('Failed to restore from cloud: ' + error.message);
+            }
+        }
+    },
+    
+    autoSave: function() {
+        if (settings.saveSystem.autoSave && Game.state === 'game') {
+            this.saveGame(this.currentSlot);
+        }
+    }
+};
+
+// --- LEADERBOARD SYSTEM ---
+const Leaderboard = {
+    entries: [],
+    
+    init: function() {
+        this.load();
+    },
+    
+    load: function() {
+        const saved = localStorage.getItem('nd_leaderboard');
+        if (saved) {
+            try {
+                this.entries = JSON.parse(saved);
+            } catch(e) {
+                console.warn("Failed to load leaderboard:", e);
+            }
+        }
+    },
+    
+    save: function() {
+        localStorage.setItem('nd_leaderboard', JSON.stringify(this.entries));
+    },
+    
+    submitScore: function(name, level, score, type = 'level') {
+        const entry = {
+            name: name || 'Player',
+            level: level,
+            score: score,
+            type: type,
+            timestamp: Date.now(),
+            date: new Date().toISOString()
+        };
+        
+        this.entries.push(entry);
+        
+        // Keep only top 100 entries per type
+        this.entries = this.entries
+            .filter(e => e.type === type)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 100);
+        
+        this.save();
+        
+        // Check for achievement
+        if (this.entries.slice(0, 10).some(e => e.name === (name || 'Player'))) {
+            Achievements.unlock('leaderboard_top');
+        }
+    },
+    
+    getTopScores: function(type = 'level', limit = 10) {
+        return this.entries
+            .filter(e => e.type === type)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, limit);
+    },
+    
+    render: function(type = 'level') {
+        const container = document.getElementById('leaderboard-content');
+        if (!container) return;
+        
+        const scores = this.getTopScores(type, 20);
+        
+        container.innerHTML = '';
+        
+        if (scores.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No scores yet!</div>';
+            return;
+        }
+        
+        scores.forEach((entry, index) => {
+            const entryEl = document.createElement('div');
+            entryEl.className = 'leaderboard-entry';
+            
+            let scoreDisplay = '';
+            switch(type) {
+                case 'level':
+                    scoreDisplay = `Level ${entry.level + 1}`;
+                    break;
+                case 'time':
+                    const minutes = Math.floor(entry.score / 60000);
+                    const seconds = Math.floor((entry.score % 60000) / 1000);
+                    const ms = Math.floor((entry.score % 1000) / 10);
+                    scoreDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
+                    break;
+                case 'coins':
+                    scoreDisplay = `${entry.score} coins`;
+                    break;
+                case 'achievements':
+                    scoreDisplay = `${entry.score} points`;
+                    break;
+            }
+            
+            entryEl.innerHTML = `
+                <div class="leaderboard-rank">#${index + 1}</div>
+                <div class="leaderboard-name">${entry.name}</div>
+                <div class="leaderboard-score">${scoreDisplay}</div>
+            `;
+            
+            container.appendChild(entryEl);
+        });
+    }
+};
+
+// --- TIME TRIAL SYSTEM ---
+const TimeTrial = {
+    active: false,
+    startTime: 0,
+    currentTime: 0,
+    bestTime: 0,
+    levelTimes: {},
+    
+    init: function() {
+        this.loadTimes();
+    },
+    
+    loadTimes: function() {
+        const saved = localStorage.getItem('nd_timetrial');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                this.levelTimes = data.levelTimes || {};
+            } catch(e) {
+                console.warn("Failed to load time trial data:", e);
+            }
+        }
+    },
+    
+    saveTimes: function() {
+        localStorage.setItem('nd_timetrial', JSON.stringify({
+            levelTimes: this.levelTimes
+        }));
+    },
+    
+    start: function() {
+        if (!settings.gameplay.timeTrial) return;
+        
+        this.active = true;
+        this.startTime = Date.now();
+        this.currentTime = 0;
+        
+        const display = document.getElementById('time-trial-display');
+        if (display) {
+            display.style.display = 'block';
+        }
+        
+        // Get best time for this level
+        this.bestTime = this.levelTimes[Game.currLvlIdx] || 0;
+        this.updateDisplay();
+    },
+    
+    stop: function() {
+        if (!this.active) return;
+        
+        this.active = false;
+        const endTime = Date.now();
+        this.currentTime = endTime - this.startTime;
+        
+        // Check if this is a new best time
+        if (this.bestTime === 0 || this.currentTime < this.bestTime) {
+            this.bestTime = this.currentTime;
+            this.levelTimes[Game.currLvlIdx] = this.bestTime;
+            this.saveTimes();
+            
+            // Submit to leaderboard
+            Leaderboard.submitScore('Player', Game.currLvlIdx, this.bestTime, 'time');
+            
+            // Show message
+            Game.showTutorialMessage('New Best Time!', 3000);
+            
+            // Achievement check
+            if (this.currentTime < 30000) { // Under 30 seconds
+                Achievements.unlock('fast_runner');
+            }
+        }
+        
+        // Hide display
+        const display = document.getElementById('time-trial-display');
+        if (display) {
+            setTimeout(() => {
+                display.style.display = 'none';
+            }, 3000);
+        }
+    },
+    
+    update: function() {
+        if (!this.active) return;
+        
+        this.currentTime = Date.now() - this.startTime;
+        this.updateDisplay();
+    },
+    
+    updateDisplay: function() {
+        const timerEl = document.getElementById('time-trial-timer');
+        const bestEl = document.getElementById('time-trial-best');
+        
+        if (!timerEl || !bestEl) return;
+        
+        // Format current time
+        const minutes = Math.floor(this.currentTime / 60000);
+        const seconds = Math.floor((this.currentTime % 60000) / 1000);
+        const ms = Math.floor((this.currentTime % 1000) / 10);
+        timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
+        
+        // Format best time
+        if (this.bestTime > 0) {
+            const bestMinutes = Math.floor(this.bestTime / 60000);
+            const bestSeconds = Math.floor((this.bestTime % 60000) / 1000);
+            const bestMs = Math.floor((this.bestTime % 1000) / 10);
+            bestEl.textContent = `Best: ${bestMinutes.toString().padStart(2, '0')}:${bestSeconds.toString().padStart(2, '0')}.${bestMs.toString().padStart(2, '0')}`;
+        } else {
+            bestEl.textContent = 'Best: --:--.--';
+        }
+    },
+    
+    reset: function() {
+        this.active = false;
+        this.startTime = 0;
+        this.currentTime = 0;
+        
+        const display = document.getElementById('time-trial-display');
+        if (display) {
+            display.style.display = 'none';
+        }
+    }
+};
+
+// --- SOUND LIBRARY ---
+const SoundLibrary = {
+    currentPack: 'default',
+    packs: {
+        default: {
+            name: 'Default',
+            description: 'Original Neon Dash sounds',
+            jump: [880, 'sine', 0.08, 0.4],
+            pad: [1320, 'square', 0.1, 0.5],
+            coin: [1000, 'triangle', 0.05, 0.3],
+            gravity: [1800, 'sawtooth', 0.1, 0.5],
+            die: [100, 'square', 0.3, 0.6],
+            win: [1500, 'sine', 0.4, 0.7],
+            dash: [1600, 'square', 0.08, 0.6],
+            slow: [500, 'triangle', 0.1, 0.4],
+            checkpoint: [1200, 'sine', 0.15, 0.4]
+        },
+        retro: {
+            name: 'Retro',
+            description: 'Classic 8-bit sounds',
+            jump: [440, 'square', 0.1, 0.3],
+            pad: [880, 'square', 0.08, 0.4],
+            coin: [660, 'square', 0.05, 0.2],
+            gravity: [220, 'square', 0.15, 0.5],
+            die: [110, 'square', 0.4, 0.7],
+            win: [1760, 'square', 0.5, 0.8],
+            dash: [1320, 'square', 0.06, 0.5],
+            slow: [330, 'square', 0.12, 0.4],
+            checkpoint: [990, 'square', 0.2, 0.3]
+        },
+        synth: {
+            name: 'Synthwave',
+            description: '80s inspired synth sounds',
+            jump: [523.25, 'sawtooth', 0.15, 0.5],
+            pad: [1046.50, 'sine', 0.2, 0.6],
+            coin: [783.99, 'triangle', 0.1, 0.4],
+            gravity: [261.63, 'sawtooth', 0.25, 0.7],
+            die: [130.81, 'sawtooth', 0.5, 0.8],
+            win: [1567.98, 'sine', 0.6, 0.9],
+            dash: [1174.66, 'square', 0.12, 0.7],
+            slow: [392.00, 'sawtooth', 0.18, 0.5],
+            checkpoint: [659.25, 'sine', 0.3, 0.6]
+        },
+        chiptune: {
+            name: 'Chiptune',
+            description: 'NES-style chiptune sounds',
+            jump: [493.88, 'square', 0.08, 0.3],
+            pad: [987.77, 'square', 0.12, 0.4],
+            coin: [739.99, 'square', 0.06, 0.25],
+            gravity: [246.94, 'square', 0.2, 0.6],
+            die: [123.47, 'square', 0.35, 0.7],
+            win: [1975.53, 'square', 0.45, 0.8],
+            dash: [1479.98, 'square', 0.1, 0.5],
+            slow: [369.99, 'square', 0.15, 0.4],
+            checkpoint: [830.61, 'square', 0.25, 0.35]
+        }
+    },
+    
+    init: function() {
+        this.currentPack = settings.audio.soundPack || 'default';
+        this.render();
+    },
+    
+    setPack: function(packId) {
+        if (this.packs[packId]) {
+            this.currentPack = packId;
+            settings.audio.soundPack = packId;
+            localStorage.setItem('nd_settings', JSON.stringify(settings));
+            
+            Game.showTutorialMessage(`Sound pack: ${this.packs[packId].name}`, 2000);
+            this.render();
+        }
+    },
+    
+    render: function() {
+        const container = document.getElementById('sound-library-content');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        Object.keys(this.packs).forEach(packId => {
+            const pack = this.packs[packId];
+            const item = document.createElement('div');
+            item.className = `sound-item ${this.currentPack === packId ? 'active' : ''}`;
+            
+            item.innerHTML = `
+                <div class="sound-item-preview" style="color: ${this.currentPack === packId ? 'var(--neon-green)' : 'var(--neon-purple)'};">🎵</div>
+                <strong>${pack.name}</strong><br>
+                <small style="color: #aaa;">${pack.description}</small>
+            `;
+            
+            item.onclick = () => {
+                this.setPack(packId);
+                item.parentNode.querySelectorAll('.sound-item').forEach(el => {
+                    el.classList.remove('active');
+                });
+                item.classList.add('active');
+            };
+            
+            container.appendChild(item);
+        });
+    },
+    
+    testSounds: function() {
+        if (!settings.audio.sfx) return;
+        
+        // Play a sequence of sounds
+        const sounds = ['jump', 'coin', 'pad', 'dash', 'win'];
+        let delay = 0;
+        
+        sounds.forEach((sound, index) => {
+            setTimeout(() => {
+                const pack = this.packs[this.currentPack];
+                if (pack && pack[sound]) {
+                    AUDIO.playTone(...pack[sound]);
+                }
+            }, delay);
+            delay += 300;
+        });
+    },
+    
+    getSound: function(soundName) {
+        const pack = this.packs[this.currentPack];
+        if (pack && pack[soundName]) {
+            return pack[soundName];
+        }
+        // Fallback to default
+        return this.packs.default[soundName];
+    }
+};
+
+// --- GAME MODES ---
+const GameModes = {
+    modes: [
+        {
+            id: 'normal',
+            name: 'Normal',
+            description: 'Standard gameplay',
+            icon: '🎮',
+            difficulty: 'medium',
+            timeLimit: 0,
+            coinMultiplier: 1,
+            unlockRequirement: 0
+        },
+        {
+            id: 'time_trial',
+            name: 'Time Trial',
+            description: 'Race against the clock',
+            icon: '⏱️',
+            difficulty: 'hard',
+            timeLimit: 60000, // 1 minute
+            coinMultiplier: 1.5,
+            unlockRequirement: 5
+        },
+        {
+            id: 'endless',
+            name: 'Endless',
+            description: 'Survive as long as possible',
+            icon: '∞',
+            difficulty: 'hard',
+            timeLimit: 0,
+            coinMultiplier: 2,
+            unlockRequirement: 10
+        },
+        {
+            id: 'challenge',
+            name: 'Daily Challenge',
+            description: 'New challenge every day',
+            icon: '🎯',
+            difficulty: 'varies',
+            timeLimit: 0,
+            coinMultiplier: 2,
+            unlockRequirement: 3
+        },
+        {
+            id: 'practice',
+            name: 'Practice',
+            description: 'No penalties, learn mechanics',
+            icon: '📚',
+            difficulty: 'easy',
+            timeLimit: 0,
+            coinMultiplier: 0.5,
+            unlockRequirement: 0
+        },
+        {
+            id: 'hardcore',
+            name: 'Hardcore',
+            description: 'One life, no checkpoints',
+            icon: '💀',
+            difficulty: 'insane',
+            timeLimit: 0,
+            coinMultiplier: 3,
+            unlockRequirement: 20
+        }
+    ],
+    
+    currentMode: 'normal',
+    
+    init: function() {
+        this.render();
+    },
+    
+    setMode: function(modeId) {
+        const mode = this.modes.find(m => m.id === modeId);
+        if (mode && unlocked >= mode.unlockRequirement) {
+            this.currentMode = modeId;
+            
+            // Apply mode settings
+            if (modeId === 'time_trial') {
+                settings.gameplay.timeTrial = true;
+                TimeTrial.start();
+            } else {
+                settings.gameplay.timeTrial = false;
+                TimeTrial.reset();
+            }
+            
+            Game.showTutorialMessage(`Mode: ${mode.name}`, 2000);
+            this.render();
+        } else if (mode) {
+            Game.showTutorialMessage(`Unlock at level ${mode.unlockRequirement + 1}`, 2000);
+        }
+    },
+    
+    render: function() {
+        const container = document.getElementById('game-modes-content');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        this.modes.forEach(mode => {
+            const item = document.createElement('div');
+            item.className = `game-mode-item ${this.currentMode === mode.id ? 'active' : ''} ${unlocked < mode.unlockRequirement ? 'locked' : ''}`;
+            
+            if (unlocked < mode.unlockRequirement) {
+                item.style.opacity = '0.6';
+                item.style.cursor = 'not-allowed';
+            }
+            
+            item.innerHTML = `
+                <div class="game-mode-icon">${mode.icon}</div>
+                <h3>${mode.name}</h3>
+                <p style="color: #aaa; margin: 10px 0;">${mode.description}</p>
+                <div class="game-mode-difficulty difficulty-${mode.difficulty}">${mode.difficulty.toUpperCase()}</div>
+                ${unlocked < mode.unlockRequirement ? 
+                    `<div style="color: var(--neon-red); margin-top: 10px; font-size: 0.9em;">Unlocks at Level ${mode.unlockRequirement + 1}</div>` : 
+                    `<div style="color: var(--neon-green); margin-top: 10px; font-size: 0.9em;">${mode.coinMultiplier}x Coins</div>`
+                }
+            `;
+            
+            if (unlocked >= mode.unlockRequirement) {
+                item.onclick = () => {
+                    this.setMode(mode.id);
+                    item.parentNode.querySelectorAll('.game-mode-item').forEach(el => {
+                        el.classList.remove('active');
+                    });
+                    item.classList.add('active');
+                };
+            }
+            
+            container.appendChild(item);
+        });
+    },
+    
+    getCurrentMode: function() {
+        return this.modes.find(m => m.id === this.currentMode) || this.modes[0];
+    }
+};
 
 // --- IMPROVED AUDIO ENGINE ---
 const AUDIO = {
@@ -1370,18 +2993,60 @@ const AUDIO = {
         }
     },
 
-    jump: () => AUDIO.playTone(880, 'sine', 0.08, 0.4),
-    pad: () => AUDIO.playTone(1320, 'square', 0.1, 0.5),
-    coin: () => AUDIO.playTone(1000, 'triangle', 0.05, 0.3),
-    gravity: () => AUDIO.playTone(1800, 'sawtooth', 0.1, 0.5),
-    die: () => AUDIO.playTone(100, 'square', 0.3, 0.6),
-    win: () => AUDIO.playTone(1500, 'sine', 0.4, 0.7),
-    dash: () => AUDIO.playTone(1600, 'square', 0.08, 0.6),
-    slow: () => AUDIO.playTone(500, 'triangle', 0.1, 0.4),
-    checkpoint: () => AUDIO.playTone(1200, 'sine', 0.15, 0.4),
+    jump: () => {
+        const sound = SoundLibrary.getSound('jump');
+        AUDIO.playTone(...sound);
+        Achievements.incrementStat('totalJumps');
+    },
+    
+    pad: () => {
+        const sound = SoundLibrary.getSound('pad');
+        AUDIO.playTone(...sound);
+        Achievements.incrementStat('padsUsed');
+    },
+    
+    coin: () => {
+        const sound = SoundLibrary.getSound('coin');
+        AUDIO.playTone(...sound);
+        Achievements.incrementStat('totalCoins');
+    },
+    
+    gravity: () => {
+        const sound = SoundLibrary.getSound('gravity');
+        AUDIO.playTone(...sound);
+    },
+    
+    die: () => {
+        const sound = SoundLibrary.getSound('die');
+        AUDIO.playTone(...sound);
+        Achievements.incrementStat('totalDeaths');
+    },
+    
+    win: () => {
+        const sound = SoundLibrary.getSound('win');
+        AUDIO.playTone(...sound);
+        Achievements.incrementStat('levelsCompleted');
+    },
+    
+    dash: () => {
+        const sound = SoundLibrary.getSound('dash');
+        AUDIO.playTone(...sound);
+        Achievements.incrementStat('dashUses');
+    },
+    
+    slow: () => {
+        const sound = SoundLibrary.getSound('slow');
+        AUDIO.playTone(...sound);
+    },
+    
+    checkpoint: () => {
+        const sound = SoundLibrary.getSound('checkpoint');
+        AUDIO.playTone(...sound);
+        Achievements.incrementStat('checkpointsUsed');
+    }
 };
 
-// --- LEVEL DATA (Only first few levels shown, rest will be generated or loaded dynamically) ---
+// --- LEVEL DATA ---
 const L = (t, x, y) => ({ t: t, x: x, y: y });
 
 const createLevel = (id, objects) => {
@@ -2622,13 +4287,23 @@ LEVELS[49] = createLevel(49, [
     L(3,18,0), L(3,38,0), L(3,58,0), L(3,78,0), L(3,98,0), L(3,118,0), L(3,138,0)
 ]);
 
-// --- GAME CONTROLLER SUPPORT (UPDATE 2) ---
+// --- ADVANCED CONTROLLER SUPPORT ---
 const Controller = {
     connected: false,
     gamepad: null,
     buttons: {},
     axes: {},
-    deadzone: 0.15,
+    deadzone: 0.08, // Lower default deadzone
+    sensitivity: 0.3, // Lower default sensitivity
+    buttonStates: {},
+    lastButtonStates: {},
+    navigationIndex: 0,
+    navigationItems: [],
+    editorMode: false,
+    crosshairX: 0,
+    crosshairY: 0,
+    crosshairSpeed: 5,
+    currentEditorTool: 0,
     
     init: function() {
         if (!settings.controls.controller) return;
@@ -2648,6 +4323,8 @@ const Controller = {
                     strongMagnitude: 0.3
                 });
             }
+            
+            this.showConnectedMessage();
         });
         
         window.addEventListener("gamepaddisconnected", (e) => {
@@ -2659,6 +4336,17 @@ const Controller = {
         
         // Check for existing gamepads
         this.scanGamepads();
+        
+        // Initialize crosshair position
+        this.crosshairX = window.innerWidth / 2;
+        this.crosshairY = window.innerHeight / 2;
+        
+        // Update button states
+        setInterval(() => this.updateButtonStates(), 16);
+    },
+    
+    showConnectedMessage: function() {
+        Game.showTutorialMessage('🎮 Controller Connected! Use A to jump, Y to retry', 3000);
     },
     
     scanGamepads: function() {
@@ -2684,93 +4372,259 @@ const Controller = {
             this.buttons[index] = button.pressed;
         });
         
-        // Update axes with deadzone
+        // Update axes with deadzone and sensitivity
         this.gamepad.axes.forEach((axis, index) => {
-            this.axes[index] = Math.abs(axis) > this.deadzone ? axis : 0;
+            const value = axis;
+            if (Math.abs(value) > this.deadzone) {
+                // Apply sensitivity curve
+                const sign = Math.sign(value);
+                const absValue = Math.abs(value);
+                const curvedValue = Math.pow(absValue, 1.5) * sign; // Exponential curve for finer control
+                this.axes[index] = curvedValue * this.sensitivity;
+            } else {
+                this.axes[index] = 0;
+            }
         });
         
-        // Handle controller inputs
-        this.handleInput();
+        // Handle controller inputs based on game state
+        if (this.editorMode && Game.state === 'editor') {
+            this.handleEditorInput();
+        } else if (Game.state === 'menu') {
+            this.handleMenuInput();
+        } else if (Game.state === 'game') {
+            this.handleGameInput();
+        }
+        
+        // Update crosshair in editor mode
+        if (this.editorMode) {
+            this.updateCrosshair();
+        }
     },
     
-    handleInput: function() {
-        if (Game.state === 'menu') {
-            // Menu navigation with D-Pad/Stick
-            if (this.buttons[12] || this.axes[1] < -0.5) { // Up
-                this.navigateMenu(-1);
+    updateButtonStates: function() {
+        this.lastButtonStates = { ...this.buttonStates };
+        
+        // Copy current button states
+        for (let i = 0; i < 17; i++) {
+            this.buttonStates[i] = this.buttons[i] || false;
+        }
+    },
+    
+    isButtonPressed: function(buttonIndex) {
+        return this.buttonStates[buttonIndex] && !this.lastButtonStates[buttonIndex];
+    },
+    
+    isButtonHeld: function(buttonIndex) {
+        return this.buttonStates[buttonIndex];
+    },
+    
+    isButtonReleased: function(buttonIndex) {
+        return !this.buttonStates[buttonIndex] && this.lastButtonStates[buttonIndex];
+    },
+    
+    handleMenuInput: function() {
+        // Get all focusable elements
+        this.navigationItems = Array.from(document.querySelectorAll('.ui-layer.visible button, .ui-layer.visible .lvl-btn.unlocked, .ui-layer.visible .costume-item, .ui-layer.visible .save-slot, .ui-layer.visible .sound-item, .ui-layer.visible .game-mode-item'));
+        
+        if (this.navigationItems.length === 0) return;
+        
+        // Handle D-pad/Stick navigation
+        if (this.isButtonPressed(12) || this.axes[1] < -0.5) { // Up
+            this.navigate(-1);
+        }
+        if (this.isButtonPressed(13) || this.axes[1] > 0.5) { // Down
+            this.navigate(1);
+        }
+        if (this.isButtonPressed(14) || this.axes[0] < -0.5) { // Left
+            this.navigate(-1, true);
+        }
+        if (this.isButtonPressed(15) || this.axes[0] > 0.5) { // Right
+            this.navigate(1, true);
+        }
+        
+        // Handle button presses
+        if (this.isButtonPressed(0)) { // A button - select
+            this.selectCurrentItem();
+        }
+        if (this.isButtonPressed(1)) { // B button - back
+            this.goBack();
+        }
+        if (this.isButtonPressed(8) || this.isButtonPressed(9)) { // Select/Start - menu/home
+            UI.home();
+        }
+    },
+    
+    handleGameInput: function() {
+        // A button for jump (with hold functionality)
+        if (this.isButtonPressed(0) || (this.isButtonHeld(0) && Math.random() < 0.1)) {
+            // 10% chance per frame to trigger jump while holding
+            if (!Input.held) {
+                action();
             }
-            if (this.buttons[13] || this.axes[1] > 0.5) { // Down
-                this.navigateMenu(1);
-            }
-            if (this.buttons[14] || this.axes[0] < -0.5) { // Left
-                this.navigateMenu(-1, true);
-            }
-            if (this.buttons[15] || this.axes[0] > 0.5) { // Right
-                this.navigateMenu(1, true);
-            }
-            if (this.buttons[0]) { // A button - select
-                this.selectMenuItem();
-            }
-            if (this.buttons[1]) { // B button - back
-                this.goBack();
-            }
-            if (this.buttons[9]) { // Start/Plus button - pause/esc
-                if (Game.state === 'game') {
-                    UI.show('menu-pause');
-                } else {
-                    UI.home();
-                }
+            Input.held = true;
+        } else if (this.isButtonReleased(0)) {
+            if (Input.held && !Input.mousePressed) {
+                release();
             }
         }
         
-        if (Game.state === 'game') {
-            // Game controls
-            if (this.buttons[0] || this.buttons[1]) { // A or B button - jump
-                if (!Input.held) {
-                    action();
-                }
-                Input.held = true;
+        // B button for dash/special action
+        if (this.isButtonPressed(1)) {
+            if (Player.mode === 'cube') {
+                Player.dash();
+            }
+        }
+        
+        // Y button for retry
+        if (this.isButtonPressed(3)) {
+            Game.retry();
+        }
+        
+        // Start button for pause menu
+        if (this.isButtonPressed(9)) {
+            UI.show('menu-pause');
+        }
+        
+        // Home/Back button to return to menu
+        if (this.isButtonPressed(8)) {
+            UI.home();
+        }
+    },
+    
+    handleEditorInput: function() {
+        // Move crosshair with left stick or D-pad
+        this.crosshairX += this.axes[0] * this.crosshairSpeed * 10;
+        this.crosshairY += this.axes[1] * this.crosshairSpeed * 10;
+        
+        // Clamp crosshair to screen
+        this.crosshairX = Math.max(0, Math.min(window.innerWidth, this.crosshairX));
+        this.crosshairY = Math.max(0, Math.min(window.innerHeight, this.crosshairY));
+        
+        // D-pad for tool selection
+        if (this.isButtonPressed(12)) { // Up
+            this.currentEditorTool = Math.max(0, this.currentEditorTool - 1);
+            this.updateEditorToolSelection();
+        }
+        if (this.isButtonPressed(13)) { // Down
+            this.currentEditorTool = Math.min(LevelEditor.tools.length - 1, this.currentEditorTool + 1);
+            this.updateEditorToolSelection();
+        }
+        if (this.isButtonPressed(14)) { // Left
+            this.currentEditorTool = Math.max(0, this.currentEditorTool - 5);
+            this.updateEditorToolSelection();
+        }
+        if (this.isButtonPressed(15)) { // Right
+            this.currentEditorTool = Math.min(LevelEditor.tools.length - 1, this.currentEditorTool + 5);
+            this.updateEditorToolSelection();
+        }
+        
+        // ZR/R2 for place block
+        if (this.isButtonHeld(7) || this.axes[2] > 0.5) {
+            LevelEditor.placeAtCrosshair(this.crosshairX, this.crosshairY);
+        }
+        
+        // ZL/L2 for delete block
+        if (this.isButtonHeld(6) || this.axes[5] > 0.5) {
+            LevelEditor.deleteAtCrosshair(this.crosshairX, this.crosshairY);
+        }
+        
+        // X button to test level
+        if (this.isButtonPressed(2)) {
+            LevelEditor.testLevel();
+        }
+        
+        // Y button to save level
+        if (this.isButtonPressed(3)) {
+            LevelEditor.save();
+        }
+        
+        // Start button to exit editor
+        if (this.isButtonPressed(9)) {
+            LevelEditor.exit();
+        }
+        
+        // Update button visual feedback
+        this.updateControllerButtonDisplay();
+    },
+    
+    updateEditorToolSelection: function() {
+        const toolButtons = document.querySelectorAll('.editor-tool-btn');
+        toolButtons.forEach((btn, index) => {
+            if (index === this.currentEditorTool) {
+                btn.classList.add('active');
+                btn.focus();
             } else {
-                if (Input.held && !Input.mousePressed) {
-                    release();
-                }
+                btn.classList.remove('active');
             }
-            
-            // Retry with Y button
-            if (this.buttons[3]) {
-                Game.retry();
-            }
-            
-            // Menu with Start button
-            if (this.buttons[9]) {
-                UI.show('menu-pause');
-            }
+        });
+        
+        // Update current tool
+        if (LevelEditor.tools[this.currentEditorTool]) {
+            LevelEditor.currentTool = LevelEditor.tools[this.currentEditorTool].id;
         }
     },
     
-    navigateMenu: function(direction, horizontal = false) {
-        // Implementation for menu navigation
-        const menuItems = document.querySelectorAll('.ui-layer.visible button, .ui-layer.visible .lvl-btn.unlocked');
-        if (menuItems.length === 0) return;
+    navigate: function(direction, horizontal = false) {
+        if (this.navigationItems.length === 0) return;
         
+        // Find current focused element
         let currentIndex = 0;
-        menuItems.forEach((item, index) => {
-            if (item === document.activeElement) {
+        const focused = document.activeElement;
+        this.navigationItems.forEach((item, index) => {
+            if (item === focused) {
                 currentIndex = index;
             }
         });
         
-        let newIndex = currentIndex + direction;
-        if (newIndex < 0) newIndex = menuItems.length - 1;
-        if (newIndex >= menuItems.length) newIndex = 0;
+        // Calculate new index based on grid (for level grid, shop grid, etc.)
+        let newIndex = currentIndex;
         
-        menuItems[newIndex].focus();
+        if (horizontal) {
+            // For grid layouts, calculate based on columns
+            const container = this.navigationItems[0].closest('#lvl-grid, #shop-content, #sound-library-content');
+            if (container) {
+                const itemsPerRow = container.id === 'lvl-grid' ? 5 : 
+                                  container.id === 'shop-content' ? 3 : 4;
+                newIndex = currentIndex + (direction * 1);
+                
+                // Handle row wrapping
+                const row = Math.floor(currentIndex / itemsPerRow);
+                const newRow = Math.floor(newIndex / itemsPerRow);
+                if (newRow !== row) {
+                    newIndex = currentIndex; // Don't change rows horizontally
+                }
+            } else {
+                newIndex = currentIndex + direction;
+            }
+        } else {
+            newIndex = currentIndex + direction;
+        }
+        
+        // Wrap around
+        if (newIndex < 0) newIndex = this.navigationItems.length - 1;
+        if (newIndex >= this.navigationItems.length) newIndex = 0;
+        
+        // Focus the new element
+        this.navigationItems[newIndex].focus();
+        this.navigationItems[newIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        
+        // Visual feedback
+        this.navigationItems[newIndex].style.transform = 'scale(1.05)';
+        setTimeout(() => {
+            this.navigationItems[newIndex].style.transform = '';
+        }, 200);
     },
     
-    selectMenuItem: function() {
+    selectCurrentItem: function() {
         const focused = document.activeElement;
-        if (focused && focused.onclick) {
+        if (focused) {
             focused.click();
+            
+            // Visual feedback
+            focused.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                focused.style.transform = '';
+            }, 100);
         }
     },
     
@@ -2780,18 +4634,80 @@ const Controller = {
             if (currentMenu.id === 'menu-levels' || 
                 currentMenu.id === 'menu-shop' || 
                 currentMenu.id === 'menu-settings' ||
-                currentMenu.id === 'menu-whatsnew') {
+                currentMenu.id === 'menu-whatsnew' ||
+                currentMenu.id === 'menu-achievements' ||
+                currentMenu.id === 'menu-savesystem' ||
+                currentMenu.id === 'menu-leaderboard' ||
+                currentMenu.id === 'menu-soundlibrary' ||
+                currentMenu.id === 'menu-gamemodes' ||
+                currentMenu.id === 'menu-controllerlayout') {
                 UI.home();
             }
         }
     },
     
+    updateCrosshair: function() {
+        const crosshair = document.getElementById('editor-crosshair');
+        if (crosshair) {
+            crosshair.style.left = this.crosshairX + 'px';
+            crosshair.style.top = this.crosshairY + 'px';
+        }
+    },
+    
+    updateControllerButtonDisplay: function() {
+        // Update visual feedback for controller buttons
+        const buttons = ['a', 'b', 'x', 'y', 'lb', 'rb', 'lt', 'rt'];
+        
+        buttons.forEach(button => {
+            const el = document.getElementById(`controller-button-${button}`);
+            if (el) {
+                const buttonIndex = {
+                    'a': 0, 'b': 1, 'x': 2, 'y': 3,
+                    'lb': 4, 'rb': 5, 'lt': 6, 'rt': 7
+                }[button];
+                
+                if (this.isButtonHeld(buttonIndex)) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            }
+        });
+    },
+    
     setDeadzone: function(value) {
         this.deadzone = value / 100;
+    },
+    
+    setSensitivity: function(value) {
+        this.sensitivity = value / 100;
+    },
+    
+    enableEditorMode: function() {
+        this.editorMode = true;
+        const crosshair = document.getElementById('editor-crosshair');
+        if (crosshair) {
+            crosshair.style.display = 'block';
+        }
+        
+        // Set initial crosshair position to center
+        this.crosshairX = window.innerWidth / 2;
+        this.crosshairY = window.innerHeight / 2;
+        this.updateCrosshair();
+        
+        Game.showTutorialMessage('Editor Mode: Use controller to edit!', 3000);
+    },
+    
+    disableEditorMode: function() {
+        this.editorMode = false;
+        const crosshair = document.getElementById('editor-crosshair');
+        if (crosshair) {
+            crosshair.style.display = 'none';
+        }
     }
 };
 
-// --- IMPROVED GAME ENGINE WITH iPad MODE (UPDATE 3) ---
+// --- IMPROVED GAME ENGINE ---
 const Game = {
     canvas: document.getElementById('gameCanvas'),
     ctx: document.getElementById('gameCanvas').getContext('2d'),
@@ -2820,6 +4736,7 @@ const Game = {
     performanceMode: 'high',
     currentQuality: 'high',
     ipadMode: false,
+    levelRatings: JSON.parse(localStorage.getItem('nd_level_ratings') || '{}'),
 
     init: function() {
         this.setupLoading();
@@ -2834,11 +4751,15 @@ const Game = {
         Player.loadColors();
         this.updateCoinDisplay();
         
-        // Initialize audio
+        // Initialize all systems
         setTimeout(() => AUDIO.init(), 500);
-        
-        // Initialize controller support
         Controller.init();
+        Achievements.init();
+        SaveSystem.init();
+        Leaderboard.init();
+        TimeTrial.init();
+        SoundLibrary.init();
+        GameModes.init();
         
         this.checkMobileControls();
         this.loop(0);
@@ -2850,8 +4771,11 @@ const Game = {
         // Initialize level editor
         LevelEditor.init();
         
-        // Setup slider event listeners (UPDATE 4)
+        // Setup slider event listeners
         this.setupSliderEvents();
+        
+        // Setup rating system
+        this.setupRatingSystem();
         
         // Hide loading screen
         setTimeout(() => {
@@ -2890,6 +4814,16 @@ const Game = {
         const deadzoneValue = document.getElementById('deadzone-value');
         deadzoneSlider.addEventListener('input', (e) => {
             deadzoneValue.textContent = e.target.value + '%';
+            Controller.setDeadzone(e.target.value);
+        });
+        
+        // Controller sensitivity slider
+        const controllerSensitivitySlider = document.getElementById('controller-sensitivity-slider');
+        const controllerSensitivityValue = document.getElementById('controller-sensitivity-value');
+        controllerSensitivitySlider.addEventListener('input', (e) => {
+            const value = e.target.value / 100;
+            controllerSensitivityValue.textContent = value.toFixed(2);
+            Controller.setSensitivity(e.target.value);
         });
         
         // UI Scale slider
@@ -2897,7 +4831,74 @@ const Game = {
         const uiScaleValue = document.getElementById('ui-scale-value');
         uiScaleSlider.addEventListener('input', (e) => {
             uiScaleValue.textContent = e.target.value + '%';
+            this.applyUIScale(e.target.value);
         });
+    },
+
+    setupRatingSystem: function() {
+        const stars = document.querySelectorAll('.rating-star');
+        stars.forEach(star => {
+            star.addEventListener('click', (e) => {
+                const value = parseInt(e.target.dataset.value);
+                this.rateCurrentLevel(value);
+            });
+        });
+    },
+
+    rateCurrentLevel: function(rating) {
+        if (this.currLvlIdx >= 0) {
+            this.levelRatings[this.currLvlIdx] = {
+                rating: rating,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('nd_level_ratings', JSON.stringify(this.levelRatings));
+            
+            // Update display
+            this.updateLevelRatingDisplay();
+            
+            // Show confirmation
+            Game.showTutorialMessage(`Rated Level ${this.currLvlIdx + 1}: ${rating}★`, 2000);
+            
+            // Achievement check
+            const ratedLevels = Object.keys(this.levelRatings).length;
+            if (ratedLevels >= 5) {
+                Achievements.unlock('rating_giver');
+            }
+        }
+    },
+
+    updateLevelRatingDisplay: function() {
+        const ratingContainer = document.getElementById('level-rating');
+        const averageEl = document.getElementById('level-rating-average');
+        
+        if (this.currLvlIdx >= 0) {
+            ratingContainer.style.display = 'block';
+            
+            const rating = this.levelRatings[this.currLvlIdx];
+            if (rating) {
+                // Highlight stars
+                const stars = document.querySelectorAll('.rating-star');
+                stars.forEach(star => {
+                    const value = parseInt(star.dataset.value);
+                    if (value <= rating.rating) {
+                        star.classList.add('active');
+                    } else {
+                        star.classList.remove('active');
+                    }
+                });
+                
+                averageEl.textContent = `Your rating: ${rating.rating}★`;
+            } else {
+                // Reset stars
+                const stars = document.querySelectorAll('.rating-star');
+                stars.forEach(star => {
+                    star.classList.remove('active');
+                });
+                averageEl.textContent = 'Rate this level';
+            }
+        } else {
+            ratingContainer.style.display = 'none';
+        }
     },
 
     setupLoading: function() {
@@ -2908,6 +4909,8 @@ const Game = {
             "Preparing levels...",
             "Initializing audio...",
             "Scanning for controllers...",
+            "Loading achievements...",
+            "Setting up save system...",
             "Almost ready..."
         ];
         
@@ -2931,11 +4934,13 @@ const Game = {
         document.getElementById('music-volume-value').textContent = settings.audio.musicVolume + '%';
         document.getElementById('sfx-toggle').checked = settings.audio.sfx;
         document.getElementById('music-toggle').checked = settings.audio.music;
+        document.getElementById('sound-pack-select').value = settings.audio.soundPack || 'default';
         
         document.getElementById('mobile-opt-toggle').checked = settings.gameplay.mobileOpt;
         document.getElementById('fps-toggle').checked = settings.gameplay.showFPS;
         document.getElementById('vibration-toggle').checked = settings.gameplay.vibration;
         document.getElementById('auto-retry-toggle').checked = settings.gameplay.autoRetry;
+        document.getElementById('time-trial-toggle').checked = settings.gameplay.timeTrial;
         
         document.getElementById('sensitivity-slider').value = settings.controls.sensitivity;
         const sensitivityText = ['Low', 'Medium', 'High'];
@@ -2944,16 +4949,24 @@ const Game = {
         document.getElementById('controller-toggle').checked = settings.controls.controller;
         document.getElementById('deadzone-slider').value = settings.controls.deadzone;
         document.getElementById('deadzone-value').textContent = settings.controls.deadzone + '%';
+        document.getElementById('controller-sensitivity-slider').value = Math.round((settings.controls.controllerSensitivity || 0.3) * 100);
+        document.getElementById('controller-sensitivity-value').textContent = (settings.controls.controllerSensitivity || 0.3).toFixed(2);
         
         document.getElementById('ui-scale-slider').value = settings.display.uiScale;
         document.getElementById('ui-scale-value').textContent = settings.display.uiScale + '%';
         document.getElementById('timer-toggle').checked = settings.display.showTimer;
         document.getElementById('colorblind-toggle').checked = settings.display.colorblind;
+        document.getElementById('high-contrast-toggle').checked = settings.display.highContrast;
+        document.getElementById('large-text-toggle').checked = settings.display.largeText;
+        document.getElementById('reduced-motion-toggle').checked = settings.display.reducedMotion;
+        document.getElementById('button-borders-toggle').checked = settings.display.buttonBorders;
         
         this.currentQuality = settings.graphics.quality;
         this.ipadMode = settings.graphics.ipadMode;
         this.updatePerformanceIndicator();
         this.applyiPadMode();
+        this.applyAccessibilitySettings();
+        this.applyButtonBorders();
     },
 
     applyGraphicsSettings: function() {
@@ -2986,6 +4999,48 @@ const Game = {
             Effects.maxParticles = settings.graphics.quality === 'low' ? 50 : 
                                   settings.graphics.quality === 'medium' ? 100 : 200;
         }
+    },
+
+    applyAccessibilitySettings: function() {
+        // High contrast mode
+        if (settings.display.highContrast) {
+            document.body.classList.add('accessibility-high-contrast');
+        } else {
+            document.body.classList.remove('accessibility-high-contrast');
+        }
+        
+        // Large text mode
+        if (settings.display.largeText) {
+            document.body.classList.add('accessibility-large-text');
+        } else {
+            document.body.classList.remove('accessibility-large-text');
+        }
+        
+        // Reduced motion
+        if (settings.display.reducedMotion) {
+            // Disable animations
+            document.querySelectorAll('*').forEach(el => {
+                const style = window.getComputedStyle(el);
+                if (style.animationDuration !== '0s') {
+                    el.style.animationDuration = '0s';
+                }
+                if (style.transitionDuration !== '0s') {
+                    el.style.transitionDuration = '0s';
+                }
+            });
+        }
+    },
+
+    applyButtonBorders: function() {
+        if (settings.display.buttonBorders) {
+            document.documentElement.style.setProperty('--black-outline', '2px solid #000');
+        } else {
+            document.documentElement.style.setProperty('--black-outline', 'none');
+        }
+    },
+
+    applyUIScale: function(scale) {
+        document.documentElement.style.fontSize = `${scale}%`;
     },
 
     updatePerformanceIndicator: function() {
@@ -3039,8 +5094,11 @@ const Game = {
         this.timeScale = 1.0;
         this.clearSlowTimer(); 
         
-        // Clear all particles on level load (UPDATE 5)
+        // Clear all particles on level load
         Effects.clearAllParticles();
+        
+        // Update level rating display
+        this.updateLevelRatingDisplay();
         
         this.start(theme[0]); 
     },
@@ -3059,6 +5117,12 @@ const Game = {
         const goalObject = this.level.find(o => o.t === 99);
         this.goalX = goalObject ? goalObject.x * CFG.tile : 100000;
 
+        // Start time trial if enabled
+        if (settings.gameplay.timeTrial) {
+            TimeTrial.start();
+        }
+        
+        // Achievement: First jump
         if(this.currLvlIdx === 0 && !tutorialDone) { 
             this.showTutorialMessage("Hold JUMP for continuous jumps!", 5000);
             tutorialDone = true;
@@ -3093,7 +5157,7 @@ const Game = {
             Game.dashActive = false;
             this.clearSlowTimer();
             
-            // Clear all particles on retry (UPDATE 5)
+            // Clear all particles on retry
             Effects.clearAllParticles();
             
             if (LevelEditor.isActive && Game.exitToEditor) {
@@ -3119,6 +5183,12 @@ const Game = {
             
             const goalObject = this.level.find(o => o.t === 99);
             this.goalX = goalObject ? goalObject.x * CFG.tile : 100000;
+            
+            // Reset time trial if active
+            if (settings.gameplay.timeTrial) {
+                TimeTrial.reset();
+                TimeTrial.start();
+            }
         }
     },
 
@@ -3147,11 +5217,23 @@ const Game = {
             AUDIO.stopBGM();
             this.clearSlowTimer();
             
+            // Stop time trial
+            if (settings.gameplay.timeTrial) {
+                TimeTrial.stop();
+            }
+            
+            // Update unlocked levels
             if (this.currLvlIdx + 2 > unlocked) {
                 unlocked = this.currLvlIdx + 2;
                 localStorage.setItem('nd_level', unlocked);
                 document.getElementById('unlock-count').innerText = unlocked;
             }
+            
+            // Submit to leaderboard
+            Leaderboard.submitScore('Player', this.currLvlIdx, this.att, 'level');
+            
+            // Auto-save
+            SaveSystem.autoSave();
             
             document.getElementById('pause-title').innerText = `LEVEL ${this.currLvlIdx + 1} COMPLETE!`;
             document.getElementById('pause-p').innerText = `Attempts: ${this.att}`;
@@ -3193,11 +5275,20 @@ const Game = {
             
             document.getElementById('pause-title').innerText = 'CRASHED!';
             document.getElementById('pause-p').innerText = `${percentage}%`;
-            this.pauseBtn.innerText = 'RETRY (R Key)';
+            this.pauseBtn.innerText = 'RETRY (Y Button)';
             this.pauseBtn.classList.remove('next');
             this.pauseBtn.onclick = () => Game.retry();
             
             UI.show('menu-pause');
+            
+            // Auto-retry if enabled
+            if (settings.gameplay.autoRetry) {
+                setTimeout(() => {
+                    if (this.state === 'dead') {
+                        Game.retry();
+                    }
+                }, 2000);
+            }
         }
     },
     
@@ -3228,6 +5319,11 @@ const Game = {
     loop: function(timestamp) {
         // Update controller
         Controller.update();
+        
+        // Update time trial
+        if (TimeTrial.active) {
+            TimeTrial.update();
+        }
         
         // Calculate delta time
         if (!this.lastFrameTime) this.lastFrameTime = timestamp;
@@ -3673,6 +5769,10 @@ const Player = {
         }
 
         this.checkCol(false, dt);
+        
+        // Update distance stat for achievements
+        const distance = Math.sqrt(Math.pow(this.x - this.lastX, 2) + Math.pow(this.y - this.lastY, 2));
+        Achievements.incrementStat('totalDistance', distance);
     },
 
     checkCol: function(isX, deltaTime) {
@@ -3688,7 +5788,10 @@ const Player = {
 
             if(r > ol && l < or && b > ot && t < ob) {
                 
-                if(o.t === 2) Game.crash();
+                if(o.t === 2) {
+                    Game.crash();
+                    Achievements.incrementStat('spikesDodged');
+                }
                 else if(o.t === 3) { 
                     totalCoins++; 
                     AUDIO.coin(); 
@@ -3715,25 +5818,27 @@ const Player = {
                     Game.level.splice(i, 1); 
                     Effects.createCheckpointEffect(ox + 5, oy - 25);
                 }
-                else if(o.t === 4) { this.setMode('ship'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#00ff00'); } 
-                else if(o.t === 5) { this.setMode('ufo'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#ffaa00'); }
-                else if(o.t === 6) { this.setMode('cube'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#ffffff'); }
-                else if(o.t === 11) { this.setMode('wave'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#ff0000'); }
-                else if(o.t === 12) { this.setMode('robot'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#00ff88'); }
-                else if(o.t === 14) { this.setMode('swing'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#ff00ff'); } 
+                else if(o.t === 4) { this.setMode('ship'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#00ff00'); Achievements.incrementStat('portalsUsed'); } 
+                else if(o.t === 5) { this.setMode('ufo'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#ffaa00'); Achievements.incrementStat('portalsUsed'); }
+                else if(o.t === 6) { this.setMode('cube'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#ffffff'); Achievements.incrementStat('portalsUsed'); }
+                else if(o.t === 11) { this.setMode('wave'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#ff0000'); Achievements.incrementStat('portalsUsed'); }
+                else if(o.t === 12) { this.setMode('robot'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#00ff88'); Achievements.incrementStat('portalsUsed'); }
+                else if(o.t === 14) { this.setMode('swing'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#ff00ff'); Achievements.incrementStat('portalsUsed'); } 
                 else if(o.t === 15) { 
                     this.setMode('cube'); 
                     this.dash(); 
                     Game.level.splice(i, 1); 
                     Effects.createPortalEffect(ox + 20, oy - 75, '#ff0000');
+                    Achievements.incrementStat('portalsUsed');
                 } 
                 else if(o.t === 16) { 
                     Game.applySlow(); 
                     Game.level.splice(i, 1);
                     Effects.createPortalEffect(ox + 20, oy - 75, '#00ff00');
+                    Achievements.incrementStat('portalsUsed');
                 }
-                else if(o.t === 9) { this.updateSize(CFG.MINI_SCALE); this.g = Math.abs(CFG.g * this.scale) * Math.sign(this.g); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#ff8800'); }
-                else if(o.t === 10) { this.updateSize(CFG.MACRO_SCALE); this.g = Math.abs(CFG.g * this.scale) * Math.sign(this.g); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#0088ff'); }
+                else if(o.t === 9) { this.updateSize(CFG.MINI_SCALE); this.g = Math.abs(CFG.g * this.scale) * Math.sign(this.g); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#ff8800'); Achievements.incrementStat('portalsUsed'); }
+                else if(o.t === 10) { this.updateSize(CFG.MACRO_SCALE); this.g = Math.abs(CFG.g * this.scale) * Math.sign(this.g); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#0088ff'); Achievements.incrementStat('portalsUsed'); }
                 else if(o.t === 1) { 
                     if(this.mode === 'wave') Game.crash(); 
                     if(isX) { 
@@ -3823,6 +5928,9 @@ const Player = {
         
         // Create mode change effect
         Effects.createModeChangeEffect(this.x, this.y, this.mainColor);
+        
+        // Achievement tracking
+        Achievements.incrementStat('modeChanges');
     },
 
     draw: function(ctx, camY) {
@@ -3873,7 +5981,7 @@ const Player = {
     }
 };
 
-// --- IMPROVED UI ---
+// --- ENHANCED UI ---
 const UI = {
     hide: () => {
         document.querySelectorAll('.ui-layer').forEach(e => {
@@ -3887,6 +5995,14 @@ const UI = {
         const element = document.getElementById(id);
         element.classList.replace('hidden', 'visible');
         element.classList.add('enhanced-transition');
+        
+        // Update controller navigation items
+        if (Controller.connected) {
+            Controller.navigationItems = Array.from(element.querySelectorAll('button, .lvl-btn.unlocked, .costume-item, .save-slot, .sound-item, .game-mode-item'));
+            if (Controller.navigationItems.length > 0) {
+                Controller.navigationItems[0].focus();
+            }
+        }
     },
     
     home: () => { 
@@ -3894,9 +6010,11 @@ const UI = {
         document.getElementById('hud').style.display = 'none';
         document.getElementById('unlock-count').innerText = unlocked;
         document.getElementById('menu-coins').innerText = totalCoins;
+        document.getElementById('menu-achievements').innerText = `${Achievements.getUnlockedCount()}/${Achievements.list.length}`;
         Game.checkMobileControls();
         AUDIO.stopBGM();
         Game.clearSlowTimer(); 
+        TimeTrial.reset();
         UI.show('menu-main');
     },
     
@@ -3924,6 +6042,7 @@ const UI = {
             let b = document.createElement('div');
             b.innerText = i + 1; 
             b.className = 'lvl-btn';
+            b.tabIndex = 0;
             
             if(i + 1 > unlocked) {
                 b.classList.add('locked');
@@ -3931,6 +6050,11 @@ const UI = {
                 b.classList.add('unlocked');
                 b.onclick = () => {
                     Transitions.show(() => Game.loadLevel(i));
+                };
+                b.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        Transitions.show(() => Game.loadLevel(i));
+                    }
                 };
             }
             grid.appendChild(b);
@@ -3947,6 +6071,9 @@ const UI = {
         const maxPage = Math.ceil(CFG.TOTAL_LEVELS / CFG.LEVELS_PER_PAGE);
         prevBtn.disabled = currentPage <= 1;
         nextBtn.disabled = currentPage >= maxPage;
+        
+        // Update level rating display
+        Game.updateLevelRatingDisplay();
     },
 
     showLevels: () => {
@@ -3961,6 +6088,7 @@ const UI = {
         SKINS.forEach((skin, index) => {
             const item = document.createElement('div');
             item.className = 'costume-item';
+            item.tabIndex = 0;
 
             const isUnlocked = unlockedSkins.includes(index);
             const isEquipped = equippedSkinIndex === index;
@@ -4002,8 +6130,22 @@ const UI = {
                     localStorage.setItem('nd_skins', JSON.stringify(unlockedSkins));
                     Game.updateCoinDisplay();
                     Player.equipSkin(index);
+                    
+                    // Achievement check
+                    if (unlockedSkins.length >= 3) {
+                        Achievements.unlock('skin_collector');
+                    }
+                    if (unlockedSkins.length === SKINS.length) {
+                        Achievements.unlock('all_skins');
+                    }
                 } else {
                     alert(`Not enough coins! Requires ${skin.cost} 💰.`);
+                }
+            };
+            
+            item.onkeydown = (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    item.onclick(e);
                 }
             };
 
@@ -4024,9 +6166,48 @@ const UI = {
         UI.show('menu-settings');
     },
 
-    // UPDATE 6: Added What's New menu
     showWhatsNew: function() {
         UI.show('menu-whatsnew');
+    },
+
+    showAchievements: function() {
+        Achievements.renderList();
+        UI.show('menu-achievements');
+    },
+
+    showSaveSystem: function() {
+        SaveSystem.updateSlotDisplay();
+        UI.show('menu-savesystem');
+    },
+
+    showLeaderboard: function() {
+        const typeSelect = document.getElementById('leaderboard-type');
+        const levelSelect = document.getElementById('leaderboard-level');
+        
+        typeSelect.onchange = () => {
+            Leaderboard.render(typeSelect.value);
+        };
+        
+        levelSelect.onchange = () => {
+            Leaderboard.render(typeSelect.value);
+        };
+        
+        Leaderboard.render(typeSelect.value);
+        UI.show('menu-leaderboard');
+    },
+
+    showSoundLibrary: function() {
+        SoundLibrary.render();
+        UI.show('menu-soundlibrary');
+    },
+
+    showGameModes: function() {
+        GameModes.render();
+        UI.show('menu-gamemodes');
+    },
+
+    showControllerLayout: function() {
+        UI.show('menu-controllerlayout');
     },
 
     saveSettings: function() {
@@ -4041,23 +6222,31 @@ const UI = {
         settings.audio.musicVolume = parseInt(document.getElementById('music-volume-slider').value);
         settings.audio.sfx = document.getElementById('sfx-toggle').checked;
         settings.audio.music = document.getElementById('music-toggle').checked;
+        settings.audio.soundPack = document.getElementById('sound-pack-select').value;
         
         // Save gameplay settings
         settings.gameplay.mobileOpt = document.getElementById('mobile-opt-toggle').checked;
         settings.gameplay.showFPS = document.getElementById('fps-toggle').checked;
         settings.gameplay.vibration = document.getElementById('vibration-toggle').checked;
         settings.gameplay.autoRetry = document.getElementById('auto-retry-toggle').checked;
+        settings.gameplay.timeTrial = document.getElementById('time-trial-toggle').checked;
         
         // Save controls settings
         settings.controls.sensitivity = parseInt(document.getElementById('sensitivity-slider').value);
         settings.controls.controller = document.getElementById('controller-toggle').checked;
         settings.controls.deadzone = parseInt(document.getElementById('deadzone-slider').value);
+        settings.controls.controllerSensitivity = parseFloat(document.getElementById('controller-sensitivity-value').textContent);
         Controller.setDeadzone(settings.controls.deadzone);
+        Controller.setSensitivity(settings.controls.controllerSensitivity * 100);
         
         // Save display settings
         settings.display.uiScale = parseInt(document.getElementById('ui-scale-slider').value);
         settings.display.showTimer = document.getElementById('timer-toggle').checked;
         settings.display.colorblind = document.getElementById('colorblind-toggle').checked;
+        settings.display.highContrast = document.getElementById('high-contrast-toggle').checked;
+        settings.display.largeText = document.getElementById('large-text-toggle').checked;
+        settings.display.reducedMotion = document.getElementById('reduced-motion-toggle').checked;
+        settings.display.buttonBorders = document.getElementById('button-borders-toggle').checked;
         
         // Apply settings immediately
         AUDIO.setVolume(settings.audio.volume / 100);
@@ -4065,338 +6254,366 @@ const UI = {
         Game.applyGraphicsSettings();
         Game.ipadMode = settings.graphics.ipadMode;
         Game.applyiPadMode();
+        Game.applyAccessibilitySettings();
+        Game.applyButtonBorders();
+        Game.applyUIScale(settings.display.uiScale);
         Game.checkMobileControls();
         
         // Save to localStorage
         localStorage.setItem('nd_settings', JSON.stringify(settings));
         
         // Show confirmation
-        alert('Settings saved successfully!');
+        Game.showTutorialMessage('Settings saved successfully!', 2000);
         
         UI.home();
+    },
+
+    resetToDefaults: function() {
+        if (confirm('Reset all settings to defaults? This will not affect your game progress.')) {
+            settings = {
+                graphics: { quality: 'high', particles: true, screenshake: true, ipadMode: false },
+                audio: { volume: 70, sfx: true, music: true, musicVolume: 50, soundPack: 'default' },
+                gameplay: { mobileOpt: true, showFPS: false, vibration: true, autoRetry: false, timeTrial: false },
+                controls: { sensitivity: 2, controller: true, deadzone: 8, controllerSensitivity: 0.3 },
+                display: { uiScale: 100, showTimer: false, colorblind: false, buttonBorders: true, highContrast: false, largeText: false, reducedMotion: false },
+                saveSystem: { autoSave: true, cloudBackup: false, saveSlots: [{}, {}, {}] }
+            };
+            
+            localStorage.setItem('nd_settings', JSON.stringify(settings));
+            Game.loadSettings();
+            Game.showTutorialMessage('Settings reset to defaults!', 2000);
+        }
     }
 };
 
+// --- ENHANCED LEVEL EDITOR ---
 const LevelEditor = {
     isActive: false,
     currentTool: 1,
-    levelData: [],
-    isPlacing: false,
+    tools: [
+        { id: 1, name: 'Block', icon: '⬜' },
+        { id: 2, name: 'Spike', icon: '⬆️' },
+        { id: 3, name: 'Coin', icon: '💰' },
+        { id: 7, name: 'Jump Pad', icon: '🦘' },
+        { id: 13, name: 'Checkpoint', icon: '💾' },
+        { id: 4, name: 'Ship Portal', icon: '🚀' },
+        { id: 5, name: 'UFO Portal', icon: '👽' },
+        { id: 6, name: 'Cube Portal', icon: '⬛' },
+        { id: 11, name: 'Wave Portal', icon: '🌊' },
+        { id: 12, name: 'Robot Portal', icon: '🤖' },
+        { id: 14, name: 'Swing Portal', icon: '🦍' },
+        { id: 15, name: 'Dash Portal', icon: '⚡' },
+        { id: 16, name: 'Slow Portal', icon: '🐌' },
+        { id: 9, name: 'Mini Portal', icon: '📏' },
+        { id: 10, name: 'Macro Portal', icon: '📐' },
+        { id: 20, name: 'Platform', icon: '🟧' }
+    ],
     editorCamX: 0,
     editorCamY: 0,
-    originalLevel: null,
+    gridSnap: true,
+    showGrid: true,
     coinCount: 0,
-
+    maxCoins: CFG.EDITOR_COIN_LIMIT,
+    
     init: function() {
-        // Initialize editor tools
-        const tools = document.querySelectorAll('.editor-tool');
-        tools.forEach(tool => {
-            tool.addEventListener('click', () => {
-                tools.forEach(t => t.classList.remove('selected'));
-                tool.classList.add('selected');
-                this.currentTool = parseInt(tool.dataset.type);
-            });
+        this.createToolbar();
+        this.setupEventListeners();
+    },
+    
+    createToolbar: function() {
+        const toolbar = document.getElementById('editor-tools');
+        if (!toolbar) return;
+        
+        toolbar.innerHTML = '';
+        
+        this.tools.forEach((tool, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'editor-tool-btn';
+            btn.innerHTML = tool.icon;
+            btn.title = tool.name;
+            btn.dataset.tool = tool.id;
+            
+            if (tool.id === this.currentTool) {
+                btn.classList.add('active');
+            }
+            
+            btn.onclick = () => {
+                this.selectTool(tool.id);
+                document.querySelectorAll('.editor-tool-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            };
+            
+            toolbar.appendChild(btn);
         });
-
-        // Editor mouse events
+        
+        // Add control buttons
+        const controls = document.createElement('div');
+        controls.style.marginTop = '10px';
+        controls.innerHTML = `
+            <button class="editor-tool-btn" onclick="LevelEditor.testLevel()" title="Test Level (X Button)">▶️</button>
+            <button class="editor-tool-btn" onclick="LevelEditor.save()" title="Save Level (Y Button)">💾</button>
+            <button class="editor-tool-btn" onclick="LevelEditor.clear()" title="Clear Level">🗑️</button>
+            <button class="editor-tool-btn" onclick="LevelEditor.exit()" title="Exit Editor (Start Button)">🚪</button>
+        `;
+        toolbar.appendChild(controls);
+    },
+    
+    setupEventListeners: function() {
+        // Mouse events for editor
         Game.canvas.addEventListener('mousedown', (e) => {
             if (!this.isActive) return;
-            this.isPlacing = true;
-            this.placeBlock(e);
+            
+            const rect = Game.canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            if (e.button === 0) { // Left click - place
+                this.placeAt(x, y);
+            } else if (e.button === 2) { // Right click - delete
+                this.deleteAt(x, y);
+            }
+            
+            e.preventDefault();
         });
-
-        Game.canvas.addEventListener('mousemove', (e) => {
-            if (!this.isActive || !this.isPlacing) return;
-            this.placeBlock(e);
-        });
-
-        Game.canvas.addEventListener('mouseup', () => {
-            this.isPlacing = false;
-        });
-
+        
         // Touch events for mobile
         Game.canvas.addEventListener('touchstart', (e) => {
             if (!this.isActive) return;
-            e.preventDefault();
-            this.isPlacing = true;
-            this.placeBlock(e.touches[0]);
-        });
-
-        Game.canvas.addEventListener('touchmove', (e) => {
-            if (!this.isActive || !this.isPlacing) return;
-            e.preventDefault();
-            this.placeBlock(e.touches[0]);
-        });
-
-        Game.canvas.addEventListener('touchend', () => {
-            this.isPlacing = false;
-        });
-
-        // Camera controls for editor (Arrow keys for up/down)
-        window.addEventListener('keydown', (e) => {
-            if (!this.isActive) return;
             
-            const camSpeed = 20;
-            switch(e.key) {
-                case 'ArrowUp':
-                    this.editorCamY -= camSpeed;
-                    e.preventDefault();
-                    break;
-                case 'ArrowDown':
-                    this.editorCamY += camSpeed;
-                    e.preventDefault();
-                    break;
-                case 'ArrowLeft':
-                    this.editorCamX -= camSpeed;
-                    e.preventDefault();
-                    break;
-                case 'ArrowRight':
-                    this.editorCamX += camSpeed;
-                    e.preventDefault();
-                    break;
-                case 'PageUp':
-                    this.editorCamY -= camSpeed * 5;
-                    e.preventDefault();
-                    break;
-                case 'PageDown':
-                    this.editorCamY += camSpeed * 5;
-                    e.preventDefault();
-                    break;
-            }
+            const rect = Game.canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            
+            this.placeAt(x, y);
+            e.preventDefault();
         });
         
-        // Update coin counter
-        this.updateCoinCounter();
+        // Prevent context menu on right click
+        Game.canvas.addEventListener('contextmenu', (e) => {
+            if (this.isActive) {
+                e.preventDefault();
+                return false;
+            }
+        });
     },
-
+    
     startNew: function() {
+        Game.state = 'editor';
         this.isActive = true;
-        this.levelData = [
-            L(1,10,0), L(1,14,0), L(1,18,0), L(1,22,0), L(1,26,0), L(1,30,0), L(1,34,0), L(1,38,0),
-            L(1,42,0), L(1,46,0), L(1,50,0), L(1,54,0), L(1,58,0), L(1,62,0), L(1,66,0), L(1,70,0),
-            L(1,74,0), L(1,78,0), L(1,82,0), L(1,86,0), L(1,90,0), L(1,94,0), L(1,98,0), L(1,102,0),
-            L(1,106,0), L(1,110,0), L(1,114,0), L(1,118,0), L(1,122,0), L(1,126,0), L(1,130,0), L(1,134,0),
-            L(1,138,0), L(1,142,0), L(1,146,0), L(1,150,0), L(1,154,0), L(1,158,0), L(1,162,0), L(1,166,0),
-            L(1,170,0), L(1,174,0), L(1,178,0), L(1,182,0), L(1,186,0), L(1,190,0), L(1,194,0), L(1,198,0),
-            L(1,202,0), L(1,206,0), L(1,210,0), L(1,214,0), L(1,218,0), L(1,222,0), L(1,226,0), L(1,230,0),
-            L(1,234,0), L(1,238,0), L(1,242,0), L(1,246,0), L(1,250,0)
+        Game.level = [
+            {t: 1, x: 10, y: 0},
+            {t: 1, x: 14, y: 0},
+            {t: 1, x: 18, y: 0},
+            {t: 99, x: 50, y: 0}
         ];
-        this.loadIntoGame();
+        this.coinCount = 0;
+        this.updateCoinCounter();
         UI.hide();
         document.getElementById('editor-tools').style.display = 'flex';
         document.getElementById('editor-coin-counter').style.display = 'block';
-        Game.state = 'editor';
-        this.editorCamX = 0;
-        this.editorCamY = 0;
-        this.originalLevel = JSON.parse(JSON.stringify(this.levelData));
-        this.updateCoinCounter();
+        
+        // Enable controller editor mode
+        Controller.enableEditorMode();
+        
+        Game.showTutorialMessage('Editor Mode: Left-click to place, Right-click to delete', 5000);
     },
-
+    
     load: function() {
-        const savedLevel = localStorage.getItem('nd_custom_level');
-        if (savedLevel) {
-            this.isActive = true;
-            this.levelData = JSON.parse(savedLevel);
-            this.loadIntoGame();
-            UI.hide();
-            document.getElementById('editor-tools').style.display = 'flex';
-            document.getElementById('editor-coin-counter').style.display = 'block';
-            Game.state = 'editor';
-            this.editorCamX = 0;
-            this.editorCamY = 0;
-            this.originalLevel = JSON.parse(JSON.stringify(this.levelData));
-            this.updateCoinCounter();
-        } else {
-            alert('No saved level found! Create a new one.');
-        }
-    },
-
-    loadIntoGame: function() {
-        Game.level = JSON.parse(JSON.stringify(this.levelData));
-        Game.camX = this.editorCamX;
-        Player.reset();
-    },
-
-    updateCamera: function() {
-        Game.camX = this.editorCamX;
-    },
-
-    updateCoinCounter: function() {
-        this.coinCount = this.levelData.filter(obj => obj.t === 3).length;
-        const counter = document.getElementById('editor-coin-counter');
-        counter.textContent = `Coins: ${this.coinCount}/${CFG.EDITOR_COIN_LIMIT}`;
-        
-        // Change color based on coin count
-        if (this.coinCount >= CFG.EDITOR_COIN_LIMIT) {
-            counter.style.borderColor = 'var(--neon-red)';
-            counter.style.color = 'var(--neon-red)';
-        } else if (this.coinCount >= CFG.EDITOR_COIN_LIMIT * 0.8) {
-            counter.style.borderColor = 'var(--neon-orange)';
-            counter.style.color = 'var(--neon-orange)';
-        } else {
-            counter.style.borderColor = 'var(--neon-yellow)';
-            counter.style.color = 'var(--neon-yellow)';
-        }
-    },
-
-    placeBlock: function(e) {
-        const rect = Game.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left + Game.camX;
-        const y = e.clientY - rect.top;
-
-        const gridX = Math.round(x / CFG.tile);
-        const gridY = Math.round((Game.floorY - y - this.editorCamY) / CFG.tile);
-
-        // Check coin limit
-        if (this.currentTool === 3) {
-            const currentCoins = this.levelData.filter(obj => obj.t === 3).length;
-            if (currentCoins >= CFG.EDITOR_COIN_LIMIT) {
-                alert(`Coin limit reached! Maximum ${CFG.EDITOR_COIN_LIMIT} coins per level.`);
-                return;
-            }
-        }
-
-        // Remove existing block at this position if current tool is eraser (0)
-        // or if we're placing a new block (remove old one first)
-        this.levelData = this.levelData.filter(block => 
-            !(block.x === gridX && block.y === gridY)
-        );
-
-        // Add new block if not eraser
-        if (this.currentTool !== 0 && this.currentTool !== 99) {
-            this.levelData.push(L(this.currentTool, gridX, gridY));
-        }
-        // Add goal separately - FIXED: Goal now ends the level properly
-        else if (this.currentTool === 99) {
-            // Remove any existing goal first
-            this.levelData = this.levelData.filter(block => block.t !== 99);
-            this.levelData.push(L(99, gridX, 0));
-        }
-
-        this.updateCoinCounter();
-        this.loadIntoGame();
-    },
-
-    save: function() {
-        // Ensure there's a goal
-        const hasGoal = this.levelData.some(block => block.t === 99);
-        if (!hasGoal) {
-            if (!confirm('No goal found! Add a goal to make the level playable. Continue saving?')) {
-                return;
-            }
-        }
-        
-        localStorage.setItem('nd_custom_level', JSON.stringify(this.levelData));
-        alert('Level saved successfully!');
-        this.originalLevel = JSON.parse(JSON.stringify(this.levelData));
-    },
-
-    exportLevel: function() {
-        const levelJSON = JSON.stringify(this.levelData);
-        const blob = new Blob([levelJSON], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'neon_dash_level.json';
-        a.click();
-        URL.revokeObjectURL(url);
-    },
-
-    importLevel: function() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const importedData = JSON.parse(event.target.result);
-                    // Check coin count in imported level
-                    const coinCount = importedData.filter(obj => obj.t === 3).length;
-                    if (coinCount > CFG.EDITOR_COIN_LIMIT) {
-                        alert(`Imported level has ${coinCount} coins (limit is ${CFG.EDITOR_COIN_LIMIT}). Some coins will be removed.`);
-                        // Remove excess coins
-                        let coinsRemoved = 0;
-                        importedData.forEach((obj, index) => {
-                            if (obj.t === 3 && coinsRemoved < coinCount - CFG.EDITOR_COIN_LIMIT) {
-                                importedData.splice(index, 1);
-                                coinsRemoved++;
-                            }
-                        });
-                    }
-                    
-                    this.levelData = importedData;
-                    this.loadIntoGame();
+        const data = prompt('Paste level JSON data:');
+        if (data) {
+            try {
+                const level = JSON.parse(data);
+                if (Array.isArray(level)) {
+                    Game.state = 'editor';
+                    this.isActive = true;
+                    Game.level = level;
+                    this.coinCount = level.filter(o => o.t === 3).length;
                     this.updateCoinCounter();
-                    alert('Level imported successfully!');
-                    this.originalLevel = JSON.parse(JSON.stringify(this.levelData));
-                } catch (error) {
-                    alert('Error importing level: Invalid file format');
+                    UI.hide();
+                    document.getElementById('editor-tools').style.display = 'flex';
+                    document.getElementById('editor-coin-counter').style.display = 'block';
+                    Controller.enableEditorMode();
+                } else {
+                    alert('Invalid level data');
                 }
-            };
-            reader.readAsText(file);
-        };
-        input.click();
+            } catch(e) {
+                alert('Error parsing JSON: ' + e.message);
+            }
+        }
     },
-
-    testLevel: function() {
-        // Check if level has a goal
-        const hasGoal = this.levelData.some(block => block.t === 99);
-        if (!hasGoal) {
-            alert('Add a goal (🎯) before testing the level!');
+    
+    showCloudLevels: function() {
+        // In a real implementation, this would fetch from a server
+        alert('Cloud levels feature would connect to a server in the full version.');
+    },
+    
+    selectTool: function(toolId) {
+        this.currentTool = toolId;
+    },
+    
+    placeAt: function(screenX, screenY) {
+        const worldX = Math.floor((screenX + this.editorCamX) / CFG.tile);
+        const worldY = Math.floor((Game.floorY - screenY) / CFG.tile);
+        
+        // Check for coin limit
+        if (this.currentTool === 3 && this.coinCount >= this.maxCoins) {
+            Game.showTutorialMessage(`Coin limit reached: ${this.maxCoins}`, 2000);
             return;
         }
         
-        // Save current editor state
-        const editorState = JSON.parse(JSON.stringify(this.levelData));
+        // Check if position is already occupied
+        const existing = Game.level.findIndex(o => 
+            o.x === worldX && o.y === worldY
+        );
         
-        // Load into game
-        Game.level = JSON.parse(JSON.stringify(editorState));
+        if (existing >= 0) {
+            // Replace existing object
+            Game.level[existing].t = this.currentTool;
+        } else {
+            // Add new object
+            Game.level.push({t: this.currentTool, x: worldX, y: worldY});
+        }
+        
+        // Update coin count
+        if (this.currentTool === 3) {
+            this.coinCount++;
+        } else if (existing >= 0 && Game.level[existing].t === 3) {
+            this.coinCount--;
+        }
+        
+        this.updateCoinCounter();
+        
+        // Visual feedback
+        Effects.createParticle(screenX, screenY, '#00ff00', 0, 0, 30, 'circle', 8);
+    },
+    
+    placeAtCrosshair: function(x, y) {
+        this.placeAt(x, y);
+    },
+    
+    deleteAt: function(screenX, screenY) {
+        const worldX = Math.floor((screenX + this.editorCamX) / CFG.tile);
+        const worldY = Math.floor((Game.floorY - screenY) / CFG.tile);
+        
+        const index = Game.level.findIndex(o => 
+            o.x === worldX && o.y === worldY
+        );
+        
+        if (index >= 0) {
+            // Update coin count if deleting a coin
+            if (Game.level[index].t === 3) {
+                this.coinCount--;
+            }
+            
+            Game.level.splice(index, 1);
+            this.updateCoinCounter();
+            
+            // Visual feedback
+            Effects.createParticle(screenX, screenY, '#ff0000', 0, 0, 30, 'circle', 8);
+        }
+    },
+    
+    deleteAtCrosshair: function(x, y) {
+        this.deleteAt(x, y);
+    },
+    
+    updateCoinCounter: function() {
+        document.getElementById('editor-coin-counter').textContent = `Coins: ${this.coinCount}/${this.maxCoins}`;
+    },
+    
+    testLevel: function() {
+        // Save current editor state
+        Game.originalEditorState = JSON.parse(JSON.stringify(Game.level));
+        Game.exitToEditor = () => {
+            Game.state = 'editor';
+            this.isActive = true;
+            Game.level = JSON.parse(JSON.stringify(Game.originalEditorState));
+            UI.hide();
+            document.getElementById('editor-tools').style.display = 'flex';
+            document.getElementById('editor-coin-counter').style.display = 'block';
+            Controller.enableEditorMode();
+        };
+        
+        // Start testing the level
         Game.state = 'game';
+        this.isActive = false;
+        UI.hide();
         document.getElementById('editor-tools').style.display = 'none';
         document.getElementById('editor-coin-counter').style.display = 'none';
         document.getElementById('hud').style.display = 'block';
         Player.reset();
         Game.camX = 0;
+        Game.att = 1;
         
-        // Set goal position
-        const goalObject = Game.level.find(o => o.t === 99);
-        Game.goalX = goalObject ? goalObject.x * CFG.tile : 100000;
+        // Disable controller editor mode
+        Controller.disableEditorMode();
         
-        // Set up return to editor
-        Game.originalEditorState = JSON.parse(JSON.stringify(this.levelData));
-        Game.exitToEditor = () => {
-            this.isActive = true;
-            this.levelData = JSON.parse(JSON.stringify(Game.originalEditorState));
-            this.loadIntoGame();
-            UI.hide();
-            document.getElementById('editor-tools').style.display = 'flex';
-            document.getElementById('editor-coin-counter').style.display = 'block';
-            Game.state = 'editor';
-            document.getElementById('hud').style.display = 'none';
-            delete Game.originalEditorState;
-            delete Game.exitToEditor;
-        };
+        Game.showTutorialMessage('Testing level... Press Start to return to editor', 3000);
     },
-
-    clearLevel: function() {
-        if (confirm('Clear the entire level?')) {
-            this.levelData = [];
-            this.loadIntoGame();
+    
+    save: function() {
+        // Ensure there's a goal
+        const hasGoal = Game.level.some(o => o.t === 99);
+        if (!hasGoal) {
+            if (confirm('No goal found. Add a goal at the end?')) {
+                const maxX = Math.max(...Game.level.map(o => o.x)) + 5;
+                Game.level.push({t: 99, x: maxX, y: 0});
+            } else {
+                return;
+            }
+        }
+        
+        const data = JSON.stringify(Game.level);
+        const blob = new Blob([data], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `neon-dash-level-${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        Game.showTutorialMessage('Level saved!', 2000);
+        
+        // Achievement check
+        Achievements.unlock('editor_master');
+    },
+    
+    clear: function() {
+        if (confirm('Clear entire level?')) {
+            Game.level = [];
+            this.coinCount = 0;
             this.updateCoinCounter();
         }
     },
-
-    exitEditor: function() {
-        this.isActive = false;
-        document.getElementById('editor-tools').style.display = 'none';
-        document.getElementById('editor-coin-counter').style.display = 'none';
-        UI.home();
+    
+    exit: function() {
+        if (confirm('Exit editor? Unsaved changes will be lost.')) {
+            this.isActive = false;
+            Game.state = 'menu';
+            document.getElementById('editor-tools').style.display = 'none';
+            document.getElementById('editor-coin-counter').style.display = 'none';
+            Controller.disableEditorMode();
+            UI.home();
+        }
+    },
+    
+    updateCamera: function() {
+        // Camera follows mouse or controller crosshair
+        if (Controller.editorMode) {
+            // Follow crosshair
+            this.editorCamX = Controller.crosshairX - window.innerWidth / 2;
+        } else {
+            // Follow mouse
+            this.editorCamX = Game.canvas.width / 2;
+        }
     }
 };
 
-// --- IMPROVED EFFECTS SYSTEM (UPDATE 5) ---
+// --- ENHANCED EFFECTS SYSTEM ---
 const Effects = {
     particles: [],
     coinEffects: [],
@@ -4426,7 +6643,6 @@ const Effects = {
     createDashEffect: function(x, y, color) {
         if (!settings.graphics.particles) return;
         
-        // Create multiple particle types for better effect
         for (let i = 0; i < 15; i++) {
             const angle = Math.random() * Math.PI * 2;
             const speed = Math.random() * 15 + 5;
@@ -4442,7 +6658,6 @@ const Effects = {
             );
         }
         
-        // Create some trail particles
         for (let i = 0; i < 5; i++) {
             this.createParticle(
                 x - i * 10,
@@ -4492,7 +6707,6 @@ const Effects = {
             );
         }
         
-        // Create some sparkle particles
         for (let i = 0; i < 3; i++) {
             this.createParticle(
                 x + 20,
@@ -4525,7 +6739,6 @@ const Effects = {
             );
         }
         
-        // Create ring effect
         for (let i = 0; i < 12; i++) {
             const ringAngle = (i / 12) * Math.PI * 2;
             this.createParticle(
@@ -4559,7 +6772,6 @@ const Effects = {
             );
         }
         
-        // Create center burst
         for (let i = 0; i < 5; i++) {
             this.createParticle(
                 x + 20,
@@ -4610,7 +6822,6 @@ const Effects = {
             );
         }
         
-        // Create upward stream
         for (let i = 0; i < 8; i++) {
             this.createParticle(
                 x,
@@ -4626,7 +6837,6 @@ const Effects = {
     },
 
     createCoinEffect: function(x, y) {
-        // Create floating coin text effect
         const coinEffect = document.createElement('div');
         coinEffect.className = 'coin-effect';
         coinEffect.innerText = '+1';
@@ -4634,14 +6844,12 @@ const Effects = {
         coinEffect.style.top = (y + Game.floorY - 150 - 15) + 'px';
         document.body.appendChild(coinEffect);
         
-        // Remove after animation
         setTimeout(() => {
             if (coinEffect.parentNode) {
                 coinEffect.parentNode.removeChild(coinEffect);
             }
         }, 1000);
         
-        // Create particle burst
         if (!settings.graphics.particles) return;
         
         for (let i = 0; i < 12; i++) {
@@ -4662,7 +6870,6 @@ const Effects = {
     clearAllParticles: function() {
         this.particles = [];
         
-        // Remove all DOM effect elements
         document.querySelectorAll('.coin-effect, .dash-effect').forEach(el => {
             if (el.parentNode) {
                 el.parentNode.removeChild(el);
@@ -4671,12 +6878,11 @@ const Effects = {
     },
 
     update: function() {
-        // Update particles
         for (let i = this.particles.length - 1; i >= 0; i--) {
             const p = this.particles[i];
             p.x += p.vx * Game.deltaTime;
             p.y += p.vy * Game.deltaTime;
-            p.vy += 0.5 * Game.deltaTime; // gravity
+            p.vy += 0.5 * Game.deltaTime;
             p.life -= Game.deltaTime;
             p.rotation += p.rotationSpeed * Game.deltaTime;
 
@@ -4689,7 +6895,6 @@ const Effects = {
     draw: function(ctx, camY) {
         if (!settings.graphics.particles) return;
         
-        // Sort particles by life for better blending
         this.particles.sort((a, b) => a.life - b.life);
         
         this.particles.forEach(p => {
@@ -4810,10 +7015,10 @@ window.onkeydown = (e) => {
         e.preventDefault(); 
         action();
     }
-    else if (e.code === 'KeyR') {
+    else if (e.code === 'KeyR' || e.code === 'KeyY') {
         Game.retry();
     }
-    else if (e.code === 'Escape' || e.code === 'Pause' || e.code === 'MediaPlayPause') {
+    else if (e.code === 'Escape' || e.code === 'Pause' || e.code === 'MediaPlayPause' || e.code === 'Backspace') {
         if (Game.state === 'game' || Game.state === 'dead' || Game.state === 'win') {
             UI.home();
         } else if (Game.state === 'editor' && Game.exitToEditor) {
@@ -4825,6 +7030,11 @@ window.onkeydown = (e) => {
     else if (e.code === 'KeyP') {
         if (Game.state === 'game') {
             UI.show('menu-pause');
+        }
+    }
+    else if (e.code === 'KeyD' || e.code === 'KeyB') {
+        if (Game.state === 'game' && Player.mode === 'cube') {
+            Player.dash();
         }
     }
 };
