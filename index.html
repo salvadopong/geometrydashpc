@@ -4318,9 +4318,9 @@ const Controller = {
             if (settings.gameplay.vibration && e.gamepad.vibrationActuator) {
                 e.gamepad.vibrationActuator.playEffect("dual-rumble", {
                     startDelay: 0,
-                    duration: 100,
-                    weakMagnitude: 0.5,
-                    strongMagnitude: 0.3
+                    duration: 300,
+                    weakMagnitude: 1.0,
+                    strongMagnitude: 0.8
                 });
             }
             
