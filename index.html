@@ -2313,47 +2313,32 @@ const Achievements = {
     }
 };
 
-// --- SAVE SYSTEM ---
+    // --- SIMPLIFIED SAVE SYSTEM ---
 const SaveSystem = {
-    currentSlot: 1,
-    slots: [null, null, null], // 3 slots only (removed slots 4 & 5)
-    
     init: function() {
-        this.loadSlots();
+        // Just initialize basic auto-save
+        console.log("Auto-save system initialized");
     },
     
-    saveGame: function(slot = this.currentSlot) {
-        if (slot < 1 || slot > 3) return;
-        
-        const saveData = {
-            timestamp: Date.now(),
-            date: new Date().toISOString(),
-            level: Game.currLvlIdx,
-            coins: totalCoins,
-            unlocked: unlocked,
-            skins: unlockedSkins,
-            equippedSkin: equippedSkinIndex,
-            achievements: Achievements.list.filter(a => a.unlocked).map(a => a.id),
-            stats: Achievements.stats,
-            playerState: {
-                x: Player.x,
-                y: Player.y,
-                mode: Player.mode,
-                scale: Player.scale
-            },
-            levelState: JSON.parse(JSON.stringify(Game.level)),
-            attempts: Game.att,
-            checkpoint: Game.currentCheckpoint
-        };
-        
-        this.slots[slot - 1] = saveData;
-        localStorage.setItem(`nd_save_slot_${slot}`, JSON.stringify(saveData));
-        
-        Game.showTutorialMessage(`Game saved to Slot ${slot}!`, 2000);
-        
-        // Update UI
-        this.updateSlotDisplay();
-    },
+    autoSave: function() {
+        if (settings.saveSystem.autoSave && Game.state === 'game') {
+            // Save basic game progress
+            localStorage.setItem('nd_level', unlocked);
+            localStorage.setItem('nd_coins', totalCoins);
+            localStorage.setItem('nd_equipped_skin', equippedSkinIndex);
+            localStorage.setItem('nd_skins', JSON.stringify(unlockedSkins));
+            localStorage.setItem('nd_tutorial_done', tutorialDone);
+            
+            // Save settings
+            localStorage.setItem('nd_settings', JSON.stringify(settings));
+            
+            // Save achievements
+            Achievements.save();
+            
+            console.log("Game auto-saved");
+        }
+    }
+};
     
     loadGame: function(slot) {
         if (slot < 1 || slot > 3 || !this.slots[slot - 1]) return false;
