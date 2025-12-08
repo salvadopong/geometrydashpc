@@ -570,23 +570,26 @@
             bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             border: 3px solid var(--neon-blue);
-            border-radius: 10px;
-            padding: 8px;
+            border-radius: 8px;
+            padding: 6px;
             display: none;
-            gap: 8px;
+            gap: 6px;
             z-index: 100;
             box-shadow: 0 0 30px var(--neon-blue);
             outline: var(--black-outline);
+            flex-wrap: wrap;
+            max-width: 90vw;
+            justify-content: center;
         }
         
         .editor-tool-btn {
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             background: rgba(0,0,0,0.8);
             border: 2px solid var(--neon-blue);
-            border-radius: 8px;
+            border-radius: 6px;
             color: var(--neon-blue);
             font-weight: bold;
             cursor: pointer;
@@ -595,6 +598,7 @@
             justify-content: center;
             transition: all 0.2s ease;
             outline: var(--black-outline);
+            font-size: 0.9em;
         }
         
         .editor-tool-btn:hover, .editor-tool-btn.active {
@@ -628,7 +632,7 @@
             width: 30px;
             height: 30px;
             pointer-events: none;
-            z-index: 60;
+            z-index: 9999;
             display: none;
         }
         
@@ -1033,6 +1037,105 @@
         .difficulty-hard { background: var(--neon-orange); color: #000; }
         .difficulty-insane { background: var(--neon-red); color: #fff; }
         
+        /* New Achievement Progress Menu */
+        .achievement-progress-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        
+        .recommended-achievements {
+            background: rgba(0,0,0,0.7);
+            border: 2px solid var(--neon-pink);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .recommended-title {
+            color: var(--neon-pink);
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .recommended-item {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--neon-purple);
+            border-radius: 8px;
+            padding: 8px;
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .recommended-icon {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        .recommended-desc {
+            color: var(--neon-green);
+            font-size: 0.9em;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(0,0,0,0.7);
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .progress-title {
+            color: var(--neon-blue);
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .progress-bar-bg {
+            background: rgba(0,0,0,0.8);
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid var(--neon-blue);
+            margin: 10px 0;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            border-radius: 8px;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shine 2s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            color: var(--neon-green);
+            font-size: 0.9em;
+        }
+        
         /* Responsive Design */
         @media (max-width: 768px) {
             .menu-box {
@@ -1093,6 +1196,12 @@
                 height: 90px;
                 font-size: 1.8em;
             }
+            
+            .editor-tool-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 0.8em;
+            }
         }
         
         @media (max-width: 480px) {
@@ -1132,6 +1241,12 @@
                 width: 80px;
                 height: 80px;
                 font-size: 1.6em;
+            }
+            
+            .editor-tool-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 0.7em;
             }
         }
     </style>
@@ -1202,11 +1317,9 @@
             <p style="font-size: 1em; color: var(--neon-pink); margin: 8px 0;">Achievements: <span id="menu-achievements">0/60</span> 🏆</p>
             <button onclick="UI.startPlay()" class="green">PLAY</button>
             <button class="pink" onclick="UI.showShop()">CUSTOMIZE</button>
-            <button onclick="UI.showAchievements()">ACHIEVEMENTS 🏆</button>
+            <button onclick="UI.showAchievementsProgress()">ACHIEVEMENTS 🏆</button>
             <button onclick="UI.showSettings()">SETTINGS</button>
             <button onclick="UI.showGameModes()">GAME MODES</button>
-            <button onclick="UI.showSaveSystem()">SAVE/LOAD</button>
-            <button class="yellow" onclick="UI.showSoundLibrary()">SOUNDS</button>
             <button onclick="UI.showEditor()">EDITOR</button>
         </div>
     </div>
@@ -1251,7 +1364,8 @@
             <h2>LEVEL EDITOR</h2>
             <p style="color: var(--neon-yellow);">Create your own levels!</p>
             <button onclick="LevelEditor.startNew()" class="green">NEW LEVEL</button>
-            <button onclick="LevelEditor.load()" class="pink">LOAD LEVEL</button>
+            <button onclick="LevelEditor.loadFromFile()" class="pink">LOAD LEVEL</button>
+            <button onclick="LevelEditor.playEditedLevel()" class="yellow">PLAY EDITED LEVEL</button>
             <button onclick="UI.home()">BACK TO MENU</button>
         </div>
     </div>
@@ -1469,48 +1583,33 @@
         </div>
     </div>
 
-    <!-- Achievement Menu -->
-    <div id="menu-achievements" class="ui-layer hidden">
+    <!-- Achievement Progress Menu -->
+    <div id="menu-achievements-progress" class="ui-layer hidden">
         <div class="menu-box">
-            <h2>ACHIEVEMENTS 🏆</h2>
-            <p style="color: var(--neon-yellow); font-size: 1.1em; margin-bottom: 15px;">
-                Progress: <span id="achievements-progress">0/60</span> (<span id="achievements-percentage">0%</span>)
-            </p>
-            <div id="achievements-list" style="max-height: 400px; overflow-y: auto; padding: 8px;"></div>
-            <button onclick="UI.home()">BACK TO MENU</button>
-        </div>
-    </div>
-
-    <!-- Save System Menu -->
-    <div id="menu-savesystem" class="ui-layer hidden">
-        <div class="menu-box">
-            <h2>SAVE & LOAD</h2>
-            <div class="save-system">
-                <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                    <button onclick="SaveSystem.saveGame(1)" class="green">SAVE TO SLOT 1</button>
-                    <button onclick="SaveSystem.saveGame(2)" class="green">SAVE TO SLOT 2</button>
-                    <button onclick="SaveSystem.saveGame(3)" class="green">SAVE TO SLOT 3</button>
+            <h2>ACHIEVEMENT PROGRESS 🏆</h2>
+            
+            <div class="progress-container">
+                <div class="progress-title">OVERALL PROGRESS</div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="achievement-progress-bar-main" style="width: 0%"></div>
                 </div>
-                <div id="save-slots"></div>
-                <div style="margin-top: 15px;">
-                    <button onclick="SaveSystem.exportSave()" class="yellow">EXPORT SAVE DATA</button>
-                    <button onclick="SaveSystem.importSave()" class="yellow">IMPORT SAVE DATA</button>
+                <div class="progress-stats">
+                    <span id="achievements-earned">0</span> earned
+                    <span id="achievements-total">0</span> total
+                    <span id="achievements-percentage">0%</span>
                 </div>
             </div>
-            <button onclick="UI.home()">BACK TO MENU</button>
-        </div>
-    </div>
-
-    <!-- Sound Library Menu -->
-    <div id="menu-soundlibrary" class="ui-layer hidden">
-        <div class="menu-box">
-            <h2>SOUND LIBRARY</h2>
-            <p style="color: var(--neon-yellow); margin-bottom: 15px;">Choose your sound pack</p>
-            <div id="sound-library-content" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;"></div>
-            <div style="margin-top: 20px;">
-                <button onclick="SoundLibrary.testSounds()" class="yellow">TEST SOUNDS</button>
-                <button onclick="UI.home()">BACK TO MENU</button>
+            
+            <div class="recommended-achievements">
+                <div class="recommended-title">RECOMMENDED ACHIEVEMENTS</div>
+                <div id="recommended-list"></div>
             </div>
+            
+            <div class="achievement-progress-container">
+                <div id="achievements-progress-list"></div>
+            </div>
+            
+            <button onclick="UI.home()">BACK TO MENU</button>
         </div>
     </div>
 
@@ -1647,7 +1746,7 @@ const SKINS = [
     { name: 'Season 1 Special', main: '#ff00ff', secondary: '#00ffff', cost: 400 }
 ];
 
-// --- ENHANCED VIBRATION SYSTEM ---
+// --- ENHANCED VIBRATION SYSTEM (STRONGER) ---
 const Vibration = {
     activeGamepad: null,
     vibrationEnabled: true,
@@ -1667,70 +1766,82 @@ const Vibration = {
             case 'jump':
                 pattern = {
                     startDelay: 0,
-                    duration: 80,
-                    weakMagnitude: 0.6,
-                    strongMagnitude: 0.3
+                    duration: 100,
+                    weakMagnitude: 1.0,
+                    strongMagnitude: 0.6
                 };
                 break;
             case 'dash':
                 pattern = {
                     startDelay: 0,
-                    duration: 120,
-                    weakMagnitude: 0.8,
-                    strongMagnitude: 0.6
+                    duration: 150,
+                    weakMagnitude: 1.0,
+                    strongMagnitude: 1.0
                 };
                 break;
             case 'crash':
                 pattern = {
                     startDelay: 0,
-                    duration: 300,
+                    duration: 400,
                     weakMagnitude: 1.0,
-                    strongMagnitude: 1.0
+                    strongMagnitude: 1.0,
+                    pulses: [
+                        {duration: 200, weakMagnitude: 1.0, strongMagnitude: 1.0},
+                        {duration: 100, weakMagnitude: 0.8, strongMagnitude: 0.8},
+                        {duration: 100, weakMagnitude: 0.6, strongMagnitude: 0.6}
+                    ]
                 };
                 break;
             case 'win':
                 pattern = {
                     startDelay: 0,
-                    duration: 500,
-                    weakMagnitude: 0.7,
-                    strongMagnitude: 0.9,
+                    duration: 800,
+                    weakMagnitude: 1.0,
+                    strongMagnitude: 1.0,
                     pulses: [
-                        {duration: 100, weakMagnitude: 0.7, strongMagnitude: 0.3},
-                        {duration: 100, weakMagnitude: 0.3, strongMagnitude: 0.7},
-                        {duration: 300, weakMagnitude: 0.9, strongMagnitude: 0.5}
+                        {duration: 150, weakMagnitude: 1.0, strongMagnitude: 0.8},
+                        {duration: 100, weakMagnitude: 0.6, strongMagnitude: 1.0},
+                        {duration: 150, weakMagnitude: 1.0, strongMagnitude: 0.8},
+                        {duration: 100, weakMagnitude: 0.6, strongMagnitude: 1.0},
+                        {duration: 300, weakMagnitude: 1.0, strongMagnitude: 0.9}
                     ]
                 };
                 break;
             case 'checkpoint':
                 pattern = {
                     startDelay: 0,
-                    duration: 150,
-                    weakMagnitude: 0.5,
-                    strongMagnitude: 0.2
+                    duration: 200,
+                    weakMagnitude: 0.8,
+                    strongMagnitude: 0.5
                 };
                 break;
             case 'coin':
                 pattern = {
                     startDelay: 0,
-                    duration: 60,
-                    weakMagnitude: 0.4,
-                    strongMagnitude: 0.1
+                    duration: 100,
+                    weakMagnitude: 0.7,
+                    strongMagnitude: 0.3
                 };
                 break;
             case 'portal':
                 pattern = {
                     startDelay: 0,
-                    duration: 200,
-                    weakMagnitude: 0.7,
-                    strongMagnitude: 0.4
+                    duration: 300,
+                    weakMagnitude: 0.9,
+                    strongMagnitude: 0.7,
+                    pulses: [
+                        {duration: 100, weakMagnitude: 0.9, strongMagnitude: 0.4},
+                        {duration: 100, weakMagnitude: 0.4, strongMagnitude: 0.9},
+                        {duration: 100, weakMagnitude: 0.9, strongMagnitude: 0.4}
+                    ]
                 };
                 break;
             default:
                 pattern = {
                     startDelay: 0,
-                    duration: 100,
-                    weakMagnitude: 0.5,
-                    strongMagnitude: 0.3
+                    duration: 150,
+                    weakMagnitude: 0.8,
+                    strongMagnitude: 0.6
                 };
         }
         
@@ -1781,7 +1892,7 @@ const Achievements = {
         { id: 'dash_master', name: 'Speed Demon', desc: 'Use dash 10 times', icon: '⚡', points: 40, unlocked: false, progress: 0, maxProgress: 10 },
         
         // New achievements for v2.1
-        { id: 'mode_changer_pro', name: 'Versatile Pro', desc: 'Use all character modes', icon: '🔄', points: 60, unlocked: false, progress: 0, maxProgress: 6 },
+        { id: 'mode_changer_pro', name: 'Versatile Pro', desc: 'Use all character modes', icon: '🔄', points: 60, unlocked: false, progress: 0, maxProgress: 5 },
         { id: 'checkpoint_saver', name: 'Safety First', desc: 'Use 5 checkpoints', icon: '💾', points: 35, unlocked: false, progress: 0, maxProgress: 5 },
         { id: 'skin_collector', name: 'Fashionista', desc: 'Unlock 3 skins', icon: '👕', points: 45, unlocked: false, progress: 0, maxProgress: 3 },
         { id: 'fast_runner', name: 'Speedrun', desc: 'Complete a level in under 30 seconds', icon: '⏱️', points: 80, unlocked: false, progress: 0, maxProgress: 1 },
@@ -1792,7 +1903,6 @@ const Achievements = {
         { id: 'ship_pilot', name: 'Space Explorer', desc: 'Travel 2000 units in ship mode', icon: '🚀', points: 85, unlocked: false, progress: 0, maxProgress: 2000 },
         { id: 'ufo_expert', name: 'Alien Tech', desc: 'Travel 1500 units in UFO mode', icon: '👽', points: 75, unlocked: false, progress: 0, maxProgress: 1500 },
         { id: 'robot_walker', name: 'Robotic', desc: 'Travel 1200 units in robot mode', icon: '🤖', points: 70, unlocked: false, progress: 0, maxProgress: 1200 },
-        { id: 'swing_king', name: 'Tarzan', desc: 'Use swing mode 15 times', icon: '🦍', points: 60, unlocked: false, progress: 0, maxProgress: 15 },
         { id: 'mini_macro', name: 'Size Changer', desc: 'Use both mini and macro modes', icon: '📏', points: 45, unlocked: false, progress: 0, maxProgress: 2 },
         { id: 'slow_mo', name: 'Matrix', desc: 'Use slow motion 10 times', icon: '🐌', points: 40, unlocked: false, progress: 0, maxProgress: 10 },
         { id: 'spike_dodger', name: 'Ninja', desc: 'Dodge 50 spikes', icon: '🗡️', points: 50, unlocked: false, progress: 0, maxProgress: 50 },
@@ -1901,7 +2011,7 @@ const Achievements = {
                     ach.progress = Math.min(this.stats.dashUses, 10);
                     break;
                 case 'mode_changer_pro':
-                    ach.progress = Math.min(this.stats.modeChanges, 6);
+                    ach.progress = Math.min(this.stats.modeChanges, 5);
                     break;
                 case 'checkpoint_saver':
                     ach.progress = Math.min(this.stats.checkpointsUsed, 5);
@@ -1920,9 +2030,6 @@ const Achievements = {
                     break;
                 case 'robot_walker':
                     ach.progress = Math.min(this.stats.totalDistance, 1200);
-                    break;
-                case 'swing_king':
-                    ach.progress = Math.min(this.stats.modeChanges, 15);
                     break;
                 case 'spike_dodger':
                     ach.progress = Math.min(this.stats.spikesDodged, 50);
@@ -2093,11 +2200,6 @@ const Achievements = {
         if (document.getElementById('menu-achievements')) {
             document.getElementById('menu-achievements').textContent = `${unlockedCount}/${totalCount}`;
         }
-        
-        if (document.getElementById('achievements-progress')) {
-            document.getElementById('achievements-progress').textContent = `${unlockedCount}/${totalCount}`;
-            document.getElementById('achievements-percentage').textContent = `${percentage}%`;
-        }
     },
     
     showCurrentProgress: function() {
@@ -2108,8 +2210,8 @@ const Achievements = {
         Game.showTutorialMessage(`Achievements: ${unlocked}/${total} | Points: ${points}`, 3000);
     },
     
-    renderList: function() {
-        const container = document.getElementById('achievements-list');
+    renderProgressList: function() {
+        const container = document.getElementById('achievements-progress-list');
         if (!container) return;
         
         container.innerHTML = '';
@@ -2140,6 +2242,74 @@ const Achievements = {
             
             container.appendChild(item);
         });
+    },
+    
+    getRecommendedAchievements: function() {
+        // Get achievements that are close to completion
+        const closeAchievements = this.list
+            .filter(ach => !ach.unlocked && ach.progress > 0 && ach.progress < ach.maxProgress)
+            .sort((a, b) => (b.progress / b.maxProgress) - (a.progress / a.maxProgress))
+            .slice(0, 3);
+        
+        // If not enough close achievements, add some easy ones
+        if (closeAchievements.length < 3) {
+            const easyAchievements = this.list
+                .filter(ach => !ach.unlocked && ach.maxProgress === 1 && ach.progress === 0)
+                .sort((a, b) => a.points - b.points)
+                .slice(0, 3 - closeAchievements.length);
+            
+            closeAchievements.push(...easyAchievements);
+        }
+        
+        return closeAchievements;
+    },
+    
+    renderRecommendedList: function() {
+        const container = document.getElementById('recommended-list');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        const recommended = this.getRecommendedAchievements();
+        
+        if (recommended.length === 0) {
+            container.innerHTML = '<div style="color: var(--neon-green); text-align: center;">All achievements completed! 🎉</div>';
+            return;
+        }
+        
+        recommended.forEach(ach => {
+            const item = document.createElement('div');
+            item.className = 'recommended-item';
+            
+            const progressPercent = Math.round((ach.progress / ach.maxProgress) * 100);
+            
+            item.innerHTML = `
+                <div class="recommended-icon">${ach.icon}</div>
+                <div>
+                    <div style="color: var(--neon-blue); font-weight: bold;">${ach.name}</div>
+                    <div class="recommended-desc">${ach.desc}</div>
+                    <div style="color: var(--neon-pink); font-size: 0.8em;">Progress: ${progressPercent}% (${ach.progress}/${ach.maxProgress})</div>
+                </div>
+            `;
+            
+            container.appendChild(item);
+        });
+    },
+    
+    updateProgressBar: function() {
+        const unlockedCount = this.getUnlockedCount();
+        const totalCount = this.list.length;
+        const percentage = Math.round((unlockedCount / totalCount) * 100);
+        
+        const progressBar = document.getElementById('achievement-progress-bar-main');
+        const earnedSpan = document.getElementById('achievements-earned');
+        const totalSpan = document.getElementById('achievements-total');
+        const percentageSpan = document.getElementById('achievements-percentage');
+        
+        if (progressBar) progressBar.style.width = `${percentage}%`;
+        if (earnedSpan) earnedSpan.textContent = unlockedCount;
+        if (totalSpan) totalSpan.textContent = totalCount;
+        if (percentageSpan) percentageSpan.textContent = `${percentage}%`;
     }
 };
 
@@ -2249,139 +2419,6 @@ const SaveSystem = {
             }
         }
         this.updateSlotDisplay();
-    },
-    
-    updateSlotDisplay: function() {
-        const container = document.getElementById('save-slots');
-        if (!container) return;
-        
-        container.innerHTML = '';
-        
-        this.slots.forEach((slot, index) => {
-            const slotNum = index + 1;
-            const slotEl = document.createElement('div');
-            slotEl.className = 'save-slot';
-            if (slot && slot.timestamp === this.slots[this.currentSlot - 1]?.timestamp) {
-                slotEl.classList.add('active');
-            }
-            
-            if (slot) {
-                const date = new Date(slot.timestamp);
-                slotEl.innerHTML = `
-                    <div class="save-slot-header">
-                        <div class="save-slot-title">Slot ${slotNum}</div>
-                        <div class="save-slot-date">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</div>
-                    </div>
-                    <div class="save-slot-stats">
-                        <div>Level: ${(slot.level || 0) + 1}</div>
-                        <div>Coins: ${slot.coins || 0}</div>
-                        <div>Progress: ${Math.round(((slot.level || 0) + 1) / CFG.TOTAL_LEVELS * 100)}%</div>
-                    </div>
-                `;
-                
-                slotEl.onclick = () => {
-                    this.currentSlot = slotNum;
-                    this.loadGame(slotNum);
-                    this.updateSlotDisplay();
-                };
-            } else {
-                slotEl.innerHTML = `
-                    <div style="text-align: center; padding: 15px; color: #666;">
-                        <div style="font-size: 1.8em; margin-bottom: 8px;">📁</div>
-                        <div>Empty Slot ${slotNum}</div>
-                    </div>
-                `;
-                
-                slotEl.onclick = () => {
-                    this.currentSlot = slotNum;
-                    this.updateSlotDisplay();
-                };
-            }
-            
-            container.appendChild(slotEl);
-        });
-    },
-    
-    exportSave: function() {
-        const allData = {
-            slots: this.slots,
-            achievements: Achievements.list,
-            stats: Achievements.stats,
-            settings: settings,
-            version: '2.1'
-        };
-        
-        const dataStr = JSON.stringify(allData);
-        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-        
-        const exportFileDefaultName = `neon-dash-save-${Date.now()}.json`;
-        
-        const linkElement = document.createElement('a');
-        linkElement.setAttribute('href', dataUri);
-        linkElement.setAttribute('download', exportFileDefaultName);
-        linkElement.click();
-        
-        Game.showTutorialMessage('Save data exported!', 2000);
-    },
-    
-    importSave: function() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const imported = JSON.parse(event.target.result);
-                    
-                    // Validate version
-                    if (imported.version !== '2.1') {
-                        alert('Invalid save file version. Please export from v2.1 or later.');
-                        return;
-                    }
-                    
-                    // Import data
-                    if (imported.slots) {
-                        imported.slots.forEach((slot, index) => {
-                            if (slot && index < 3) {
-                                localStorage.setItem(`nd_save_slot_${index + 1}`, JSON.stringify(slot));
-                            }
-                        });
-                    }
-                    
-                    if (imported.achievements) {
-                        Achievements.list = imported.achievements;
-                    }
-                    
-                    if (imported.stats) {
-                        Achievements.stats = imported.stats;
-                    }
-                    
-                    if (imported.settings) {
-                        settings = imported.settings;
-                        localStorage.setItem('nd_settings', JSON.stringify(settings));
-                        Game.loadSettings();
-                    }
-                    
-                    // Reload
-                    this.loadSlots();
-                    Achievements.save();
-                    Achievements.updateDisplay();
-                    
-                    Game.showTutorialMessage('Save data imported successfully!', 3000);
-                } catch(error) {
-                    alert('Failed to import save file: ' + error.message);
-                }
-            };
-            
-            reader.readAsText(file);
-        };
-        
-        input.click();
     },
     
     autoSave: function() {
@@ -2571,7 +2608,6 @@ const SoundLibrary = {
     
     init: function() {
         this.currentPack = settings.audio.soundPack || 'default';
-        this.render();
     },
     
     setPack: function(packId) {
@@ -2581,37 +2617,7 @@ const SoundLibrary = {
             localStorage.setItem('nd_settings', JSON.stringify(settings));
             
             Game.showTutorialMessage(`Sound pack: ${this.packs[packId].name}`, 2000);
-            this.render();
         }
-    },
-    
-    render: function() {
-        const container = document.getElementById('sound-library-content');
-        if (!container) return;
-        
-        container.innerHTML = '';
-        
-        Object.keys(this.packs).forEach(packId => {
-            const pack = this.packs[packId];
-            const item = document.createElement('div');
-            item.className = `sound-item ${this.currentPack === packId ? 'active' : ''}`;
-            
-            item.innerHTML = `
-                <div class="sound-item-preview" style="color: ${this.currentPack === packId ? 'var(--neon-green)' : 'var(--neon-purple)'};">🎵</div>
-                <strong>${pack.name}</strong><br>
-                <small style="color: #aaa;">${pack.description}</small>
-            `;
-            
-            item.onclick = () => {
-                this.setPack(packId);
-                item.parentNode.querySelectorAll('.sound-item').forEach(el => {
-                    el.classList.remove('active');
-                });
-                item.classList.add('active');
-            };
-            
-            container.appendChild(item);
-        });
     },
     
     testSounds: function() {
@@ -2942,8 +2948,8 @@ const Controller = {
     gamepad: null,
     buttons: {},
     axes: {},
-    deadzone: 0.05, // Lower deadzone for quicker response
-    sensitivity: 0.4, // Higher sensitivity for quicker response
+    deadzone: 0.05,
+    sensitivity: 0.4,
     buttonStates: {},
     lastButtonStates: {},
     navigationIndex: 0,
@@ -2951,10 +2957,13 @@ const Controller = {
     editorMode: false,
     crosshairX: 0,
     crosshairY: 0,
-    crosshairSpeed: 8, // Faster crosshair speed
+    crosshairSpeed: 8,
     currentEditorTool: 0,
     lastUpdateTime: 0,
-    updateInterval: 8, // Update every 8ms for 125Hz response
+    updateInterval: 8,
+    isMenuActive: false,
+    currentSlider: null,
+    sliderValue: 0,
     
     init: function() {
         if (!settings.controls.controller) return;
@@ -2969,9 +2978,9 @@ const Controller = {
             if (settings.gameplay.vibration && e.gamepad.vibrationActuator) {
                 e.gamepad.vibrationActuator.playEffect("dual-rumble", {
                     startDelay: 0,
-                    duration: 200,
-                    weakMagnitude: 0.8,
-                    strongMagnitude: 0.6
+                    duration: 300,
+                    weakMagnitude: 1.0,
+                    strongMagnitude: 0.8
                 });
             }
             
@@ -2997,6 +3006,16 @@ const Controller = {
         // Update button states with precise timing
         this.updateButtonStates();
         setInterval(() => this.updateButtonStates(), this.updateInterval);
+        
+        // Setup universal crosshair
+        this.setupCrosshair();
+    },
+    
+    setupCrosshair: function() {
+        const crosshair = document.getElementById('universal-crosshair');
+        if (crosshair) {
+            crosshair.style.display = 'none'; // Hidden by default
+        }
     },
     
     showConnectedMessage: function() {
@@ -3035,7 +3054,6 @@ const Controller = {
         this.gamepad.axes.forEach((axis, index) => {
             const value = axis;
             if (Math.abs(value) > this.deadzone) {
-                // Apply sensitivity curve for quicker response
                 const sign = Math.sign(value);
                 const absValue = Math.abs(value);
                 const curvedValue = Math.pow(absValue, 1.3) * sign;
@@ -3045,17 +3063,68 @@ const Controller = {
             }
         });
         
-        // Handle controller inputs based on game state
-        if (this.editorMode && Game.state === 'editor') {
-            this.handleEditorInput();
-        } else if (Game.state === 'menu') {
-            this.handleMenuInput();
-        } else if (Game.state === 'game') {
-            this.handleGameInput();
+        // Handle slider control
+        if (this.currentSlider) {
+            this.handleSliderControl();
+        } else {
+            // Handle controller inputs based on game state
+            if (this.editorMode && Game.state === 'editor') {
+                this.handleEditorInput();
+            } else if (Game.state === 'menu' || this.isMenuActive) {
+                this.handleMenuInput();
+            } else if (Game.state === 'game') {
+                this.handleGameInput();
+            }
         }
         
         // Update crosshair position
         this.updateCrosshair();
+    },
+    
+    handleSliderControl: function() {
+        if (!this.currentSlider) return;
+        
+        // Use left stick to adjust slider
+        if (Math.abs(this.axes[0]) > 0.1) {
+            const currentValue = parseInt(this.currentSlider.value);
+            const step = this.currentSlider.max / 100;
+            const newValue = currentValue + (this.axes[0] * step);
+            
+            // Clamp value
+            const clampedValue = Math.max(this.currentSlider.min, Math.min(this.currentSlider.max, newValue));
+            this.currentSlider.value = clampedValue;
+            
+            // Trigger input event
+            this.currentSlider.dispatchEvent(new Event('input', { bubbles: true }));
+            
+            // Update display value
+            const valueElement = document.getElementById(this.currentSlider.dataset.valueId);
+            if (valueElement) {
+                if (this.currentSlider.id === 'volume-slider' || 
+                    this.currentSlider.id === 'music-volume-slider' ||
+                    this.currentSlider.id === 'ui-scale-slider' ||
+                    this.currentSlider.id === 'deadzone-slider') {
+                    valueElement.textContent = Math.round(clampedValue) + '%';
+                } else if (this.currentSlider.id === 'sensitivity-slider') {
+                    const sensitivityText = ['Low', 'Medium', 'High'];
+                    valueElement.textContent = sensitivityText[Math.round(clampedValue) - 1];
+                } else if (this.currentSlider.id === 'controller-sensitivity-slider') {
+                    const value = clampedValue / 100;
+                    valueElement.textContent = value.toFixed(2);
+                }
+            }
+        }
+        
+        // A button to confirm slider adjustment
+        if (this.isButtonPressed(0)) {
+            this.currentSlider = null;
+            Vibration.triggerVibration('coin');
+        }
+        
+        // B button to cancel
+        if (this.isButtonPressed(1)) {
+            this.currentSlider = null;
+        }
     },
     
     updateButtonStates: function() {
@@ -3081,7 +3150,7 @@ const Controller = {
     
     handleMenuInput: function() {
         // Get all focusable elements
-        this.navigationItems = Array.from(document.querySelectorAll('.ui-layer.visible button, .ui-layer.visible .lvl-btn.unlocked, .ui-layer.visible .costume-item, .ui-layer.visible .save-slot, .ui-layer.visible .sound-item, .ui-layer.visible .game-mode-item'));
+        this.navigationItems = Array.from(document.querySelectorAll('.ui-layer.visible button, .ui-layer.visible .lvl-btn.unlocked, .ui-layer.visible .costume-item, .ui-layer.visible .save-slot, .ui-layer.visible .sound-item, .ui-layer.visible .game-mode-item, .ui-layer.visible .settings-item input[type="range"]'));
         
         if (this.navigationItems.length === 0) return;
         
@@ -3093,10 +3162,24 @@ const Controller = {
             this.navigate(1);
         }
         if (this.isButtonPressed(14) || this.axes[0] < -0.3) { // Left
-            this.navigate(-1, true);
+            if (this.currentSlider) {
+                // Adjust slider
+                const step = this.currentSlider.max / 20;
+                this.currentSlider.value = Math.max(this.currentSlider.min, this.currentSlider.value - step);
+                this.currentSlider.dispatchEvent(new Event('input', { bubbles: true }));
+            } else {
+                this.navigate(-1, true);
+            }
         }
         if (this.isButtonPressed(15) || this.axes[0] > 0.3) { // Right
-            this.navigate(1, true);
+            if (this.currentSlider) {
+                // Adjust slider
+                const step = this.currentSlider.max / 20;
+                this.currentSlider.value = Math.min(this.currentSlider.max, this.currentSlider.value + step);
+                this.currentSlider.dispatchEvent(new Event('input', { bubbles: true }));
+            } else {
+                this.navigate(1, true);
+            }
         }
         
         // Handle button presses with immediate response
@@ -3109,9 +3192,15 @@ const Controller = {
         if (this.isButtonPressed(8) || this.isButtonPressed(9)) { // Select/Start - menu/home
             UI.home();
         }
+        
+        // Update crosshair to follow focused element
+        this.updateCrosshairToFocused();
     },
     
     handleGameInput: function() {
+        // Hide crosshair during gameplay
+        this.hideCrosshair();
+        
         // A button for jump with immediate response
         if (this.isButtonPressed(0) || (this.isButtonHeld(0) && Math.random() < 0.15)) {
             if (!Input.held) {
@@ -3139,6 +3228,7 @@ const Controller = {
         // Start button for pause menu
         if (this.isButtonPressed(9)) {
             UI.show('menu-pause');
+            this.showCrosshair();
         }
         
         // Home/Back button to return to menu
@@ -3149,8 +3239,8 @@ const Controller = {
     
     handleEditorInput: function() {
         // Move crosshair with left stick or D-pad with faster speed
-        this.crosshairX += this.axes[0] * this.crosshairSpeed * 15;
-        this.crosshairY += this.axes[1] * this.crosshairSpeed * 15;
+        this.crosshairX += this.axes[0] * this.crosshairSpeed * 20;
+        this.crosshairY += this.axes[1] * this.crosshairSpeed * 20;
         
         // Clamp crosshair to screen
         this.crosshairX = Math.max(0, Math.min(window.innerWidth, this.crosshairX));
@@ -3166,11 +3256,11 @@ const Controller = {
             this.updateEditorToolSelection();
         }
         if (this.isButtonPressed(14)) { // Left
-            this.currentEditorTool = Math.max(0, this.currentEditorTool - 5);
+            this.currentEditorTool = Math.max(0, this.currentEditorTool - 1);
             this.updateEditorToolSelection();
         }
         if (this.isButtonPressed(15)) { // Right
-            this.currentEditorTool = Math.min(LevelEditor.tools.length - 1, this.currentEditorTool + 5);
+            this.currentEditorTool = Math.min(LevelEditor.tools.length - 1, this.currentEditorTool + 1);
             this.updateEditorToolSelection();
         }
         
@@ -3198,6 +3288,11 @@ const Controller = {
         if (this.isButtonPressed(9)) {
             LevelEditor.exit();
         }
+        
+        // B button to clear level
+        if (this.isButtonPressed(1)) {
+            LevelEditor.clear();
+        }
     },
     
     updateEditorToolSelection: function() {
@@ -3205,7 +3300,6 @@ const Controller = {
         toolButtons.forEach((btn, index) => {
             if (index === this.currentEditorTool) {
                 btn.classList.add('active');
-                btn.focus();
             } else {
                 btn.classList.remove('active');
             }
@@ -3215,36 +3309,43 @@ const Controller = {
         if (LevelEditor.tools[this.currentEditorTool]) {
             LevelEditor.currentTool = LevelEditor.tools[this.currentEditorTool].id;
         }
+        
+        Vibration.triggerVibration('coin');
     },
     
     navigate: function(direction, horizontal = false) {
         if (this.navigationItems.length === 0) return;
         
         // Find current focused element
-        let currentIndex = 0;
+        let currentIndex = -1;
         const focused = document.activeElement;
         this.navigationItems.forEach((item, index) => {
-            if (item === focused) {
+            if (item === focused || (this.currentSlider && item === this.currentSlider)) {
                 currentIndex = index;
             }
         });
         
-        // Calculate new index based on grid
+        if (currentIndex === -1) currentIndex = 0;
+        
+        // Calculate new index
         let newIndex = currentIndex;
         
         if (horizontal) {
             // For grid layouts, calculate based on columns
-            const container = this.navigationItems[0].closest('#lvl-grid, #shop-content, #sound-library-content');
+            const container = this.navigationItems[currentIndex].closest('#lvl-grid, #shop-content');
             if (container) {
-                const itemsPerRow = container.id === 'lvl-grid' ? 5 : 
-                                  container.id === 'shop-content' ? 3 : 4;
+                const itemsPerRow = container.id === 'lvl-grid' ? 5 : 3;
+                const row = Math.floor(currentIndex / itemsPerRow);
+                const col = currentIndex % itemsPerRow;
+                
                 newIndex = currentIndex + (direction * 1);
+                const newRow = Math.floor(newIndex / itemsPerRow);
+                const newCol = newIndex % itemsPerRow;
                 
                 // Handle row wrapping
-                const row = Math.floor(currentIndex / itemsPerRow);
-                const newRow = Math.floor(newIndex / itemsPerRow);
                 if (newRow !== row) {
-                    newIndex = currentIndex; // Don't change rows horizontally
+                    // Move to next row but same column
+                    newIndex = currentIndex;
                 }
             } else {
                 newIndex = currentIndex + direction;
@@ -3258,29 +3359,71 @@ const Controller = {
         if (newIndex >= this.navigationItems.length) newIndex = 0;
         
         // Focus the new element
-        this.navigationItems[newIndex].focus();
-        this.navigationItems[newIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        const newElement = this.navigationItems[newIndex];
         
-        // Visual feedback
-        this.navigationItems[newIndex].style.transform = 'scale(1.05)';
-        setTimeout(() => {
-            this.navigationItems[newIndex].style.transform = '';
-        }, 150);
+        // Check if it's a slider
+        if (newElement.tagName === 'INPUT' && newElement.type === 'range') {
+            this.currentSlider = newElement;
+            newElement.focus();
+            Vibration.triggerVibration('checkpoint');
+        } else {
+            this.currentSlider = null;
+            newElement.focus();
+            
+            // Scroll into view
+            newElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            // Visual feedback
+            newElement.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                newElement.style.transform = '';
+            }, 150);
+            
+            Vibration.triggerVibration('coin');
+        }
+    },
+    
+    updateCrosshairToFocused: function() {
+        const focused = document.activeElement;
+        if (focused && focused !== document.body) {
+            const rect = focused.getBoundingClientRect();
+            this.crosshairX = rect.left + rect.width / 2;
+            this.crosshairY = rect.top + rect.height / 2;
+            this.updateCrosshair();
+        }
     },
     
     selectCurrentItem: function() {
         const focused = document.activeElement;
         if (focused) {
-            focused.click();
+            if (focused.tagName === 'INPUT' && focused.type === 'range') {
+                // Slider already being controlled
+                return;
+            }
             
-            // Visual feedback
-            focused.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                focused.style.transform = '';
-            }, 80);
-            
-            // Vibration feedback
-            Vibration.triggerVibration('coin');
+            // Check if it's a clickable element
+            if (focused.tagName === 'BUTTON' || 
+                focused.classList.contains('lvl-btn') || 
+                focused.classList.contains('costume-item') ||
+                focused.classList.contains('save-slot') ||
+                focused.classList.contains('sound-item') ||
+                focused.classList.contains('game-mode-item') ||
+                focused.classList.contains('toggle-switch')) {
+                
+                focused.click();
+                
+                // Visual feedback
+                focused.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    focused.style.transform = '';
+                }, 80);
+                
+                // Vibration feedback
+                Vibration.triggerVibration('coin');
+            } else if (focused.tagName === 'SELECT') {
+                // Open select dropdown
+                focused.focus();
+            }
         }
     },
     
@@ -3290,12 +3433,12 @@ const Controller = {
             if (currentMenu.id === 'menu-levels' || 
                 currentMenu.id === 'menu-shop' || 
                 currentMenu.id === 'menu-settings' ||
-                currentMenu.id === 'menu-achievements' ||
-                currentMenu.id === 'menu-savesystem' ||
-                currentMenu.id === 'menu-soundlibrary' ||
+                currentMenu.id === 'menu-achievements-progress' ||
                 currentMenu.id === 'menu-gamemodes' ||
                 currentMenu.id === 'menu-editor') {
                 UI.home();
+            } else if (currentMenu.id === 'menu-pause') {
+                Game.retry();
             }
         }
     },
@@ -3308,9 +3451,19 @@ const Controller = {
         }
     },
     
+    updateCrosshairToFocused: function() {
+        const focused = document.activeElement;
+        if (focused && focused !== document.body) {
+            const rect = focused.getBoundingClientRect();
+            this.crosshairX = rect.left + rect.width / 2;
+            this.crosshairY = rect.top + rect.height / 2;
+            this.updateCrosshair();
+        }
+    },
+    
     showCrosshair: function() {
         const crosshair = document.getElementById('universal-crosshair');
-        if (crosshair && Game.state !== 'game') {
+        if (crosshair && this.connected && (Game.state === 'menu' || Game.state === 'editor' || this.isMenuActive)) {
             crosshair.style.display = 'block';
         }
     },
@@ -3344,7 +3497,16 @@ const Controller = {
     
     disableEditorMode: function() {
         this.editorMode = false;
-        if (Game.state !== 'menu' && Game.state !== 'editor') {
+        if (Game.state !== 'menu') {
+            this.hideCrosshair();
+        }
+    },
+    
+    setMenuActive: function(active) {
+        this.isMenuActive = active;
+        if (active && this.connected) {
+            this.showCrosshair();
+        } else if (!active && Game.state !== 'editor') {
             this.hideCrosshair();
         }
     }
@@ -3430,6 +3592,7 @@ const Game = {
         // Volume slider
         const volumeSlider = document.getElementById('volume-slider');
         const volumeValue = document.getElementById('volume-value');
+        volumeSlider.dataset.valueId = 'volume-value';
         volumeSlider.addEventListener('input', (e) => {
             volumeValue.textContent = e.target.value + '%';
         });
@@ -3437,6 +3600,7 @@ const Game = {
         // Music volume slider
         const musicSlider = document.getElementById('music-volume-slider');
         const musicValue = document.getElementById('music-volume-value');
+        musicSlider.dataset.valueId = 'music-volume-value';
         musicSlider.addEventListener('input', (e) => {
             musicValue.textContent = e.target.value + '%';
         });
@@ -3444,6 +3608,7 @@ const Game = {
         // Sensitivity slider
         const sensitivitySlider = document.getElementById('sensitivity-slider');
         const sensitivityValue = document.getElementById('sensitivity-value');
+        sensitivitySlider.dataset.valueId = 'sensitivity-value';
         sensitivitySlider.addEventListener('input', (e) => {
             const sensitivityText = ['Low', 'Medium', 'High'];
             sensitivityValue.textContent = sensitivityText[e.target.value - 1];
@@ -3452,6 +3617,7 @@ const Game = {
         // Deadzone slider
         const deadzoneSlider = document.getElementById('deadzone-slider');
         const deadzoneValue = document.getElementById('deadzone-value');
+        deadzoneSlider.dataset.valueId = 'deadzone-value';
         deadzoneSlider.addEventListener('input', (e) => {
             deadzoneValue.textContent = e.target.value + '%';
             Controller.setDeadzone(e.target.value);
@@ -3460,6 +3626,7 @@ const Game = {
         // Controller sensitivity slider
         const controllerSensitivitySlider = document.getElementById('controller-sensitivity-slider');
         const controllerSensitivityValue = document.getElementById('controller-sensitivity-value');
+        controllerSensitivitySlider.dataset.valueId = 'controller-sensitivity-value';
         controllerSensitivitySlider.addEventListener('input', (e) => {
             const value = e.target.value / 100;
             controllerSensitivityValue.textContent = value.toFixed(2);
@@ -3469,6 +3636,7 @@ const Game = {
         // UI Scale slider
         const uiScaleSlider = document.getElementById('ui-scale-slider');
         const uiScaleValue = document.getElementById('ui-scale-value');
+        uiScaleSlider.dataset.valueId = 'ui-scale-value';
         uiScaleSlider.addEventListener('input', (e) => {
             uiScaleValue.textContent = e.target.value + '%';
             this.applyUIScale(e.target.value);
@@ -3484,7 +3652,6 @@ const Game = {
             "Initializing audio...",
             "Scanning for controllers...",
             "Loading achievements...",
-            "Setting up save system...",
             "Almost ready..."
         ];
         
@@ -3659,6 +3826,10 @@ const Game = {
         this.bgSat = theme[2];
         
         this.level = JSON.parse(JSON.stringify(LEVELS[idx])); 
+        
+        // Remove incompatible blocks/portals (swing portal removed)
+        this.level = this.level.filter(obj => obj.t !== 14); // Remove swing portal
+        
         this.currentCheckpoint = null;
         this.startPos = { x: CFG.START_X * CFG.tile, y: 0, g: CFG.g, mode: 'cube', scale: CFG.MACRO_SCALE };
         this.timeScale = 1.0;
@@ -3753,6 +3924,8 @@ const Game = {
             } else if(!this.currentCheckpoint) {
                 try {
                     this.level = JSON.parse(JSON.stringify(LEVELS[this.currLvlIdx]));
+                    // Remove incompatible blocks/portals
+                    this.level = this.level.filter(obj => obj.t !== 14); // Remove swing portal
                 } catch (error) {
                     console.error("Failed to reload level on retry:", error);
                     this.level = JSON.parse(JSON.stringify(LEVELS[0]));
@@ -3840,6 +4013,7 @@ const Game = {
             };
 
             UI.show('menu-pause');
+            Controller.setMenuActive(true);
         }
     },
 
@@ -3870,11 +4044,7 @@ const Game = {
             this.pauseBtn.onclick = () => Game.retry();
             
             UI.show('menu-pause');
-            
-            // Show crosshair in pause menu
-            if (Controller.connected) {
-                Controller.showCrosshair();
-            }
+            Controller.setMenuActive(true);
             
             // Auto-retry if enabled
             if (settings.gameplay.autoRetry) {
@@ -4122,11 +4292,11 @@ const Game = {
                     ctx.strokeRect(dx, dy, CFG.tile, 15); 
                 }
             }
-            // Portal types
-            else if ([4,5,6,11,12,14,15,16,9,10].includes(o.t)) {
+            // Portal types (swing portal removed)
+            else if ([4,5,6,11,12,15,16,9,10].includes(o.t)) {
                 const portalColors = {
                     4: '#00ff00', 5: '#ffaa00', 6: '#ffffff', 11: '#ff0000',
-                    12: '#00ff88', 14: '#ff00ff', 15: '#ff0000', 16: '#00ff00',
+                    12: '#00ff88', 15: '#ff0000', 16: '#00ff00',
                     9: '#ff8800', 10: '#0088ff'
                 };
                 ctx.strokeStyle = portalColors[o.t];
@@ -4345,10 +4515,6 @@ const Player = {
                 this.angle = waveRad * 1.5;
                 this.dy += this.g * 0.0001; 
             }
-            else if (this.mode === 'swing') {
-                this.dy += CFG.g * gravityFactor * Game.timeScale * dt;
-                this.angle += (0-this.angle) * 0.1 * dt; 
-            }
 
             if (this.mode !== 'wave') {
                 if(this.dy > termScaled) this.dy = termScaled;
@@ -4456,7 +4622,6 @@ const Player = {
                 else if(o.t === 6) { this.setMode('cube'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#ffffff'); Achievements.incrementStat('portalsUsed'); }
                 else if(o.t === 11) { this.setMode('wave'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#ff0000'); Achievements.incrementStat('portalsUsed'); }
                 else if(o.t === 12) { this.setMode('robot'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#00ff88'); Achievements.incrementStat('portalsUsed'); }
-                else if(o.t === 14) { this.setMode('swing'); Game.level.splice(i, 1); Effects.createPortalEffect(ox + 20, oy - 75, '#ff00ff'); Achievements.incrementStat('portalsUsed'); } 
                 else if(o.t === 15) { 
                     // Dash Portal - Only works if not already used in this life
                     if (!dashPortalUsed && this.canDashFromPortal) {
@@ -4507,14 +4672,9 @@ const Player = {
                             this.dy = 0; 
                         }
                         
-                        if(hitGround && (this.mode === 'cube' || this.mode === 'robot' || this.mode === 'swing')) {
+                        if(hitGround && (this.mode === 'cube' || this.mode === 'robot')) {
                             this.onGround = true;
                             this.canDashFromPortal = true; // Reset dash portal ability when touching ground
-                        }
-                        
-                        if(this.mode === 'swing' && this.isSwinging) { 
-                            this.isSwinging = true; 
-                            this.swingBlock = o; 
                         }
                     }
                 }
@@ -4562,7 +4722,7 @@ const Player = {
         this.isSwinging = false;
         this.swingBlock = null;
 
-        if (m === 'cube' || m === 'robot' || m === 'swing') {
+        if (m === 'cube' || m === 'robot') {
             this.dy = 0;
             this.onGround = true;
         }
@@ -4637,10 +4797,8 @@ const UI = {
             e.classList.remove('enhanced-transition');
         });
         
-        // Show crosshair when no menu is visible (except in game)
-        if (Controller.connected && Game.state !== 'game') {
-            Controller.showCrosshair();
-        }
+        // Hide crosshair when no menu is visible
+        Controller.setMenuActive(false);
     },
     
     show: (id) => { 
@@ -4649,17 +4807,17 @@ const UI = {
         element.classList.replace('hidden', 'visible');
         element.classList.add('enhanced-transition');
         
+        // Set controller menu active
+        Controller.setMenuActive(true);
+        
         // Update controller navigation items
         if (Controller.connected) {
-            Controller.navigationItems = Array.from(element.querySelectorAll('button, .lvl-btn.unlocked, .costume-item, .save-slot, .sound-item, .game-mode-item'));
-            if (Controller.navigationItems.length > 0) {
-                Controller.navigationItems[0].focus();
-            }
-        }
-        
-        // Show crosshair in menus
-        if (Controller.connected) {
-            Controller.showCrosshair();
+            setTimeout(() => {
+                Controller.navigationItems = Array.from(element.querySelectorAll('button, .lvl-btn.unlocked, .costume-item, .game-mode-item, .settings-item input[type="range"]'));
+                if (Controller.navigationItems.length > 0) {
+                    Controller.navigationItems[0].focus();
+                }
+            }, 100);
         }
     },
     
@@ -4674,11 +4832,6 @@ const UI = {
         Game.clearSlowTimer(); 
         TimeTrial.reset();
         UI.show('menu-main');
-        
-        // Show crosshair in main menu
-        if (Controller.connected) {
-            Controller.showCrosshair();
-        }
     },
     
     startPlay: () => { 
@@ -4819,6 +4972,11 @@ const UI = {
     },
 
     showEditor: function() {
+        // Check if on mobile
+        if (Game.isMobile) {
+            alert("Editor mode is only available on PC/Mac.");
+            return;
+        }
         UI.show('menu-editor');
     },
 
@@ -4826,19 +4984,11 @@ const UI = {
         UI.show('menu-settings');
     },
 
-    showAchievements: function() {
-        Achievements.renderList();
-        UI.show('menu-achievements');
-    },
-
-    showSaveSystem: function() {
-        SaveSystem.updateSlotDisplay();
-        UI.show('menu-savesystem');
-    },
-
-    showSoundLibrary: function() {
-        SoundLibrary.render();
-        UI.show('menu-soundlibrary');
+    showAchievementsProgress: function() {
+        Achievements.renderProgressList();
+        Achievements.renderRecommendedList();
+        Achievements.updateProgressBar();
+        UI.show('menu-achievements-progress');
     },
 
     showGameModes: function() {
@@ -4940,7 +5090,6 @@ const LevelEditor = {
         { id: 6, name: 'Cube Portal', icon: '⬛' },
         { id: 11, name: 'Wave Portal', icon: '🌊' },
         { id: 12, name: 'Robot Portal', icon: '🤖' },
-        { id: 14, name: 'Swing Portal', icon: '🦍' },
         { id: 15, name: 'Dash Portal', icon: '⚡' },
         { id: 16, name: 'Slow Portal', icon: '🐌' },
         { id: 9, name: 'Mini Portal', icon: '📏' },
@@ -4965,12 +5114,21 @@ const LevelEditor = {
         
         toolbar.innerHTML = '';
         
+        // Element buttons in order
+        const elementContainer = document.createElement('div');
+        elementContainer.style.display = 'flex';
+        elementContainer.style.flexWrap = 'wrap';
+        elementContainer.style.justifyContent = 'center';
+        elementContainer.style.gap = '6px';
+        elementContainer.style.marginBottom = '10px';
+        
         this.tools.forEach((tool, index) => {
             const btn = document.createElement('button');
             btn.className = 'editor-tool-btn';
             btn.innerHTML = tool.icon;
             btn.title = tool.name;
             btn.dataset.tool = tool.id;
+            btn.dataset.index = index;
             
             if (tool.id === this.currentTool) {
                 btn.classList.add('active');
@@ -4982,19 +5140,27 @@ const LevelEditor = {
                 btn.classList.add('active');
             };
             
-            toolbar.appendChild(btn);
+            elementContainer.appendChild(btn);
         });
         
-        // Add control buttons
-        const controls = document.createElement('div');
-        controls.style.marginTop = '10px';
-        controls.innerHTML = `
+        toolbar.appendChild(elementContainer);
+        
+        // Control buttons below
+        const controlContainer = document.createElement('div');
+        controlContainer.style.display = 'flex';
+        controlContainer.style.justifyContent = 'center';
+        controlContainer.style.gap = '6px';
+        controlContainer.style.borderTop = '2px solid var(--neon-blue)';
+        controlContainer.style.paddingTop = '10px';
+        
+        controlContainer.innerHTML = `
             <button class="editor-tool-btn" onclick="LevelEditor.testLevel()" title="Test Level (X Button)">▶️</button>
             <button class="editor-tool-btn" onclick="LevelEditor.save()" title="Save Level (Y Button)">💾</button>
             <button class="editor-tool-btn" onclick="LevelEditor.clear()" title="Clear Level">🗑️</button>
             <button class="editor-tool-btn" onclick="LevelEditor.exit()" title="Exit Editor (Start Button)">🚪</button>
         `;
-        toolbar.appendChild(controls);
+        
+        toolbar.appendChild(controlContainer);
     },
     
     setupEventListeners: function() {
@@ -5038,6 +5204,12 @@ const LevelEditor = {
     },
     
     startNew: function() {
+        // Check if on mobile
+        if (Game.isMobile) {
+            alert("Editor mode is only available on PC/Mac.");
+            return;
+        }
+        
         Game.state = 'editor';
         this.isActive = true;
         Game.level = [
@@ -5058,28 +5230,139 @@ const LevelEditor = {
         Game.showTutorialMessage('Editor Mode: Left-click to place, Right-click to delete', 5000);
     },
     
-    load: function() {
-        const data = prompt('Paste level JSON data:');
-        if (data) {
-            try {
-                const level = JSON.parse(data);
-                if (Array.isArray(level)) {
-                    Game.state = 'editor';
-                    this.isActive = true;
-                    Game.level = level;
-                    this.coinCount = level.filter(o => o.t === 3).length;
-                    this.updateCoinCounter();
-                    UI.hide();
-                    document.getElementById('editor-tools').style.display = 'flex';
-                    document.getElementById('editor-coin-counter').style.display = 'block';
-                    Controller.enableEditorMode();
-                } else {
-                    alert('Invalid level data');
-                }
-            } catch(e) {
-                alert('Error parsing JSON: ' + e.message);
-            }
+    loadFromFile: function() {
+        // Check if on mobile
+        if (Game.isMobile) {
+            alert("Editor mode is only available on PC/Mac.");
+            return;
         }
+        
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (Array.isArray(data)) {
+                        Game.state = 'editor';
+                        this.isActive = true;
+                        Game.level = data;
+                        this.coinCount = data.filter(o => o.t === 3).length;
+                        this.updateCoinCounter();
+                        UI.hide();
+                        document.getElementById('editor-tools').style.display = 'flex';
+                        document.getElementById('editor-coin-counter').style.display = 'block';
+                        Controller.enableEditorMode();
+                        Game.showTutorialMessage('Level loaded successfully!', 2000);
+                    } else {
+                        alert('Invalid level data: Expected array');
+                    }
+                } catch(e) {
+                    alert('Error parsing JSON: ' + e.message);
+                }
+            };
+            
+            reader.readAsText(file);
+        };
+        
+        input.click();
+    },
+    
+    playEditedLevel: function() {
+        // Check if on mobile
+        if (Game.isMobile) {
+            alert("Editor mode is only available on PC/Mac.");
+            return;
+        }
+        
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    
+                    // Check version compatibility
+                    let compatible = true;
+                    let incompatibleBlocks = [];
+                    
+                    // Check for incompatible blocks/portals
+                    data.forEach(obj => {
+                        // Swing portal (14) is incompatible
+                        if (obj.t === 14) {
+                            compatible = false;
+                            incompatibleBlocks.push('Swing Portal (ID: 14)');
+                        }
+                        // Check for other potentially incompatible blocks
+                        if (obj.t < 1 || obj.t > 20 || obj.t === 8 || obj.t === 17 || obj.t === 18 || obj.t === 19) {
+                            compatible = false;
+                            incompatibleBlocks.push(`Unknown Block (ID: ${obj.t})`);
+                        }
+                    });
+                    
+                    if (!compatible) {
+                        alert(`Incompatible blocks/portals found:\n${incompatibleBlocks.join('\n')}\n\nVersion 2.0 or later required.`);
+                        return;
+                    }
+                    
+                    // Remove swing portals just in case
+                    const filteredData = data.filter(obj => obj.t !== 14);
+                    
+                    // Check if it's a valid level
+                    if (Array.isArray(filteredData) && filteredData.some(obj => obj.t === 99)) {
+                        // Save current editor state
+                        Game.originalEditorState = JSON.parse(JSON.stringify(Game.level));
+                        Game.exitToEditor = () => {
+                            Game.state = 'editor';
+                            this.isActive = true;
+                            Game.level = JSON.parse(JSON.stringify(Game.originalEditorState));
+                            UI.hide();
+                            document.getElementById('editor-tools').style.display = 'flex';
+                            document.getElementById('editor-coin-counter').style.display = 'block';
+                            Controller.enableEditorMode();
+                        };
+                        
+                        // Load the level
+                        Game.state = 'game';
+                        this.isActive = false;
+                        Game.level = filteredData;
+                        Game.currLvlIdx = -1; // Custom level
+                        UI.hide();
+                        document.getElementById('editor-tools').style.display = 'none';
+                        document.getElementById('editor-coin-counter').style.display = 'none';
+                        document.getElementById('hud').style.display = 'block';
+                        Player.reset();
+                        Game.camX = 0;
+                        Game.att = 1;
+                        
+                        // Disable controller editor mode
+                        Controller.disableEditorMode();
+                        
+                        Game.showTutorialMessage('Playing custom level... Press Start to return to editor', 3000);
+                    } else {
+                        alert('Invalid level data: Missing goal or not an array');
+                    }
+                } catch(e) {
+                    alert('Error parsing JSON: ' + e.message);
+                }
+            };
+            
+            reader.readAsText(file);
+        };
+        
+        input.click();
     },
     
     selectTool: function(toolId) {
@@ -5157,6 +5440,12 @@ const LevelEditor = {
     },
     
     testLevel: function() {
+        // Check if on mobile
+        if (Game.isMobile) {
+            alert("Editor mode is only available on PC/Mac.");
+            return;
+        }
+        
         // Save current editor state
         Game.originalEditorState = JSON.parse(JSON.stringify(Game.level));
         Game.exitToEditor = () => {
@@ -5187,6 +5476,12 @@ const LevelEditor = {
     },
     
     save: function() {
+        // Check if on mobile
+        if (Game.isMobile) {
+            alert("Editor mode is only available on PC/Mac.");
+            return;
+        }
+        
         // Ensure there's a goal
         const hasGoal = Game.level.some(o => o.t === 99);
         if (!hasGoal) {
@@ -5719,7 +6014,7 @@ window.oncontextmenu = (e) => {
     }
 };
 
-// LEVEL DATA - Empty levels for you to create
+// LEVEL DATA - Tutorial level and empty levels
 const L = (t, x, y) => ({ t: t, x: x, y: y });
 
 const createLevel = (id, objects) => {
@@ -5728,21 +6023,42 @@ const createLevel = (id, objects) => {
     return objects;
 }
 
-const LEVELS = [];
-
-    LEVELS[0] = createLevel(0, [
-    L(1,10,0), L(1,14,0), L(1,18,0), L(1,22,0), L(1,26,0), L(7,30,0), L(1,34,0), L(1,38,0), L(7,42,0),
-    L(2,46,0), L(1,50,0), L(2,54,0), L(1,58,0), L(7,62,0), L(1,66,0), L(1,70,0), L(1,74,0), L(7,78,0),
-    L(1,82,0), L(1,86,0), L(1,90,2), L(1,94,2), L(1,98,2), L(7,102,0), L(1,106,0), L(1,110,0), L(7,114,0),
-    L(2,118,0), L(2,122,0), L(2,126,0), L(1,130,0), L(1,134,0), L(7,138,0), L(1,142,0), L(1,146,0),
-    L(1,150,0), L(2,154,0), L(1,158,0), L(1,162,0), L(7,166,0), L(1,170,0), L(1,174,0), L(1,178,0),
-    L(2,182,0), L(1,186,0), L(1,190,0), L(1,194,0), L(7,198,0), L(1,202,0), L(1,206,0), L(1,210,0),
-    L(2,214,0), L(1,218,0), L(1,222,0), L(1,226,0), L(7,230,0), L(1,234,0), L(1,238,0), L(1,242,0),
-    L(3,12,0), L(3,20,0), L(3,28,0), L(3,36,0), L(3,44,0), L(3,52,0), L(3,60,0), L(3,68,0), L(3,76,0),
-    L(3,84,0), L(3,92,0), L(3,100,0), L(3,108,0), L(3,116,0), L(3,124,0), L(3,132,0), L(3,140,0),
-    L(3,148,0), L(3,156,0), L(3,164,0), L(3,172,0), L(3,180,0), L(3,188,0), L(3,196,0), L(3,204,0),
-    L(3,212,0), L(3,220,0), L(3,228,0), L(3,236,0), L(3,244,0)
-]);
+// Tutorial Level (Level 0)
+const LEVELS = [
+    // Level 0 - Tutorial
+    createLevel(0, [
+        L(1, 10, 0), L(1, 14, 0), L(1, 18, 0), L(1, 22, 0), L(1, 26, 0),
+        L(3, 15, 0), // Coin
+        L(1, 30, 0), L(1, 34, 0), L(1, 38, 0), L(1, 42, 0),
+        L(7, 46, 0), // Jump pad
+        L(1, 50, 0), L(1, 54, 0), L(1, 58, 0),
+        L(2, 62, 0), // Spike
+        L(1, 66, 0), L(1, 70, 0), L(1, 74, 0),
+        L(3, 68, 0), // Coin
+        L(1, 78, 0), L(1, 82, 0), L(1, 86, 0),
+        L(13, 90, 0), // Checkpoint
+        L(1, 94, 0), L(1, 98, 0), L(1, 102, 0),
+        L(4, 106, 0), // Ship portal
+        L(1, 110, 0), L(1, 114, 0), L(1, 118, 0),
+        L(6, 122, 0), // Cube portal
+        L(1, 126, 0), L(1, 130, 0), L(1, 134, 0),
+        L(3, 128, 0), // Coin
+        L(1, 138, 0), L(1, 142, 0), L(1, 146, 0),
+        L(5, 150, 0), // UFO portal
+        L(1, 154, 0), L(1, 158, 0), L(1, 162, 0),
+        L(11, 166, 0), // Wave portal
+        L(1, 170, 0), L(1, 174, 0), L(1, 178, 0),
+        L(12, 182, 0), // Robot portal
+        L(1, 186, 0), L(1, 190, 0), L(1, 194, 0),
+        L(9, 198, 0), // Mini portal
+        L(1, 202, 0), L(1, 206, 0), L(1, 210, 0),
+        L(10, 214, 0), // Macro portal
+        L(1, 218, 0), L(1, 222, 0), L(1, 226, 0),
+        L(15, 230, 0), // Dash portal
+        L(1, 234, 0), L(1, 238, 0), L(1, 242, 0),
+        L(16, 246, 0) // Slow portal
+    ])
+];
 
 // Level 1: Cube Precision
 LEVELS[1] = createLevel(1, [
