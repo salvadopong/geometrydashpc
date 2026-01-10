@@ -2337,7 +2337,7 @@ const SaveSystem = {
             
             console.log("Game auto-saved");
         }
-}
+    },
     
     loadGame: function(slot) {
         if (slot < 1 || slot > 3) return false;
@@ -2412,12 +2412,6 @@ const SaveSystem = {
             }
         }
         this.updateSlotDisplay();
-    },
-    
-    autoSave: function() {
-        if (settings.saveSystem.autoSave && Game.state === 'game') {
-            this.saveGame(this.currentSlot);
-        }
     }
 };
 
