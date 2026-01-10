@@ -2340,55 +2340,64 @@ const SaveSystem = {
 }
     
     loadGame: function(slot) {
-        if (slot < 1 || slot > 3 || !this.slots[slot - 1]) return false;
+        if (slot < 1 || slot > 3) return false;
         
-        const saveData = this.slots[slot - 1];
+        // Load from localStorage directly (simplified version)
+        const saved = localStorage.getItem(`nd_save_slot_${slot}`);
+        if (!saved) return false;
         
-        // Load basic data
-        Game.currLvlIdx = saveData.level || 0;
-        totalCoins = saveData.coins || 0;
-        unlocked = saveData.unlocked || 1;
-        unlockedSkins = saveData.skins || [0];
-        equippedSkinIndex = saveData.equippedSkin || 0;
-        
-        // Load achievements
-        if (saveData.achievements) {
-            Achievements.list.forEach(ach => {
-                ach.unlocked = saveData.achievements.includes(ach.id);
-            });
+        try {
+            const saveData = JSON.parse(saved);
+            
+            // Load basic data
+            Game.currLvlIdx = saveData.level || 0;
+            totalCoins = saveData.coins || 0;
+            unlocked = saveData.unlocked || 1;
+            unlockedSkins = saveData.skins || [0];
+            equippedSkinIndex = saveData.equippedSkin || 0;
+            
+            // Load achievements
+            if (saveData.achievements) {
+                Achievements.list.forEach(ach => {
+                    ach.unlocked = saveData.achievements.includes(ach.id);
+                });
+            }
+            
+            // Load stats
+            if (saveData.stats) {
+                Achievements.stats = { ...Achievements.stats, ...saveData.stats };
+            }
+            
+            // Load player state if in game
+            if (Game.state === 'game' && saveData.playerState) {
+                Player.x = saveData.playerState.x;
+                Player.y = saveData.playerState.y;
+                Player.mode = saveData.playerState.mode;
+                Player.scale = saveData.playerState.scale;
+                Player.updateSize(Player.scale);
+            }
+            
+            // Load level state
+            if (saveData.levelState) {
+                Game.level = JSON.parse(JSON.stringify(saveData.levelState));
+            }
+            
+            // Load checkpoint
+            Game.currentCheckpoint = saveData.checkpoint;
+            
+            // Update displays
+            Game.updateCoinDisplay();
+            Player.loadColors();
+            document.getElementById('unlock-count').innerText = unlocked;
+            Achievements.updateDisplay();
+            
+            Game.showTutorialMessage(`Game loaded from Slot ${slot}!`, 2000);
+            
+            return true;
+        } catch(e) {
+            console.warn(`Failed to load save slot ${slot}:`, e);
+            return false;
         }
-        
-        // Load stats
-        if (saveData.stats) {
-            Achievements.stats = { ...Achievements.stats, ...saveData.stats };
-        }
-        
-        // Load player state if in game
-        if (Game.state === 'game' && saveData.playerState) {
-            Player.x = saveData.playerState.x;
-            Player.y = saveData.playerState.y;
-            Player.mode = saveData.playerState.mode;
-            Player.scale = saveData.playerState.scale;
-            Player.updateSize(Player.scale);
-        }
-        
-        // Load level state
-        if (saveData.levelState) {
-            Game.level = JSON.parse(JSON.stringify(saveData.levelState));
-        }
-        
-        // Load checkpoint
-        Game.currentCheckpoint = saveData.checkpoint;
-        
-        // Update displays
-        Game.updateCoinDisplay();
-        Player.loadColors();
-        document.getElementById('unlock-count').innerText = unlocked;
-        Achievements.updateDisplay();
-        
-        Game.showTutorialMessage(`Game loaded from Slot ${slot}!`, 2000);
-        
-        return true;
     },
     
     loadSlots: function() {
